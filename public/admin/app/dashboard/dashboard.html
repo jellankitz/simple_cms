@@ -1,0 +1,24 @@
+<!-- Page Content -->
+<div id="page-wrapper">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <h1 class="page-header">Blank</h1>
+                <ul class="list-group" ng-if="vm.users">
+                    <li class="list-group-item" ng-repeat="user in vm.users">
+                        <h4>{{user.name}}</h4>
+                        <h5>{{user.email}}</h5>
+                    </li>
+                </ul>
+                <div class="alert alert-danger" ng-if="vm.error.error">
+                    <strong>There was an error: </strong> {{vm.errors.error}}
+                    <br>Please go back and login again
+                </div>
+            </div>
+            <!-- /.col-lg-12 -->
+        </div>
+        <!-- /.row -->
+    </div>
+    <!-- /.container-fluid -->
+</div>
+<!-- /#page-wrapper -->
