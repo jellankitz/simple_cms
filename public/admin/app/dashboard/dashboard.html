@@ -4,6 +4,7 @@
         <div class="row">
             <div class="col-lg-12">
                 <h1 class="page-header">Blank</h1>
+                <h5 ng-if="authenticated">Welcome, {{currentUser.first_name + " " + currentUser.last_name}}</h5>
                 <ul class="list-group" ng-if="vm.users">
                     <li class="list-group-item" ng-repeat="user in vm.users">
                         <h4>{{user.name}}</h4>

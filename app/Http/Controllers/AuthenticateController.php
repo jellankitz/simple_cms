@@ -9,11 +9,11 @@ use Cartalyst\Sentinel\Native\Facades\Sentinel;
 use App\User;
 
 class AuthenticateController extends Controller {
-    
+
     public function __construct() {
         $this->middleware('jwt.auth', ['except' => ['authenticate']]);
     }
-    
+
     /**
      * Display a listing of the resource.
      *
@@ -27,7 +27,7 @@ class AuthenticateController extends Controller {
     public function authenticate(Request $request) {
         $credentials = $request->only('email', 'password');
         $token = null;
-        
+
         try {
             // verify the credentials and create a token for the user
             if (!$user = Sentinel::authenticate($credentials)) {
@@ -43,64 +43,24 @@ class AuthenticateController extends Controller {
         return response()->json(compact('token'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create() {
-        //
-    }
+    public function getAuthenticatedUser() {
+        try {
+            if (!$user = JWTAuth::parseToken()->authenticate()) {
+                return response()->json(['user_not_found'], 404);
+            }
+        } catch (Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request) {
-        //
-    }
+            return response()->json(['token_expired'], $e->getStatusCode());
+        } catch (Tymon\JWTAuth\Exceptions\TokenInvalidException $e) {
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id) {
-        //
-    }
+            return response()->json(['token_invalid'], $e->getStatusCode());
+        } catch (Tymon\JWTAuth\Exceptions\JWTException $e) {
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id) {
-        //
-    }
+            return response()->json(['token_absent'], $e->getStatusCode());
+        }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id) {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id) {
-        //
+        // the token is valid and we have found the user via the sub claim
+        return response()->json(compact('user'));
     }
 
 }

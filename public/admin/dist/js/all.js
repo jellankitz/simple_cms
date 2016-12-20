@@ -380,7 +380,8 @@ c=c.replace(q,function(a){p=a;return""});e=e||{};t(m.urlParams,function(a,b){h=e
     'use strict';
 
     angular.module('app')
-            .config(config);
+            .config(config)
+            .run(run);
 
     config.$inject = ['$stateProvider', '$urlRouterProvider', '$authProvider', '$resourceProvider'];
 
@@ -434,7 +435,7 @@ c=c.replace(q,function(a){p=a;return""});e=e||{};t(m.urlParams,function(a,b){h=e
             return UserService;
         }
 
-        doAuth.$inject = ['$auth', '$q','$injector'];
+        doAuth.$inject = ['$auth', '$q', '$injector'];
         /* @ngInject */
         function doAuth($auth, $q, $injector) {
             var deferred = $q.defer();
@@ -448,6 +449,47 @@ c=c.replace(q,function(a){p=a;return""});e=e||{};t(m.urlParams,function(a,b){h=e
             return deferred.promise;
         }
     }
+
+    run.$inject = ['$rootScope', '$state'];
+    /* @ngInject */
+    function run($rootScope, $state) {
+        // $stateChangeStart is fired whenever the state changes. We can use some parameters
+        // such as toState to hook into details about the state as it is changing
+        $rootScope.$on('$stateChangeStart', function (event, toState) {
+
+            // Grab the user from local storage and parse it to an object
+            var user = JSON.parse(localStorage.getItem('user'));
+
+            // If there is any user data in local storage then the user is quite
+            // likely authenticated. If their token is expired, or if they are
+            // otherwise not actually authenticated, they will be redirected to
+            // the auth state because of the rejected request anyway
+            if (user) {
+
+                // The user's authenticated state gets flipped to
+                // true so we can now show parts of the UI that rely
+                // on the user being logged in
+                $rootScope.authenticated = true;
+
+                // Putting the user's data on $rootScope allows
+                // us to access it anywhere across the app. Here
+                // we are grabbing what is in local storage
+                $rootScope.currentUser = user;
+
+                // If the user is logged in and we hit the auth route we don't need
+                // to stay there and can send the user to the main state
+                if (toState.name === "auth") {
+
+                    // Preventing the default behavior allows us to use $state.go
+                    // to change states
+                    event.preventDefault();
+
+                    // go to the "main" state which in our case is users
+                    $state.go('dashboard');
+                }
+            }
+        });
+    }
 })();
 (function(){
     'use strict';
@@ -455,9 +497,28 @@ c=c.replace(q,function(a){p=a;return""});e=e||{};t(m.urlParams,function(a,b){h=e
     angular.module('app')
             .controller('NavController', NavController);
     
-    function NavController(){
+    NavController.$inject = ['$auth', '$rootScope']
+    
+    /* @ngInject */
+    function NavController($auth, $rootScope){
         var vm = this;
+        vm.logout = logout;
         
+        /////////////
+        
+        function logout(){
+            $auth.logout().then(function() {
+
+                // Remove the authenticated user from local storage
+                localStorage.removeItem('user');
+                // Flip authenticated to false so that we no longer
+                // show UI elements dependant on the user being logged in
+                $rootScope.authenticated = false;
+
+                // Remove the current user info from rootscope
+                $rootScope.currentUser = null;
+            });
+        }
     }
 })();
 (function(){
@@ -466,10 +527,10 @@ c=c.replace(q,function(a){p=a;return""});e=e||{};t(m.urlParams,function(a,b){h=e
     angular.module('app')
             .controller('LoginController', LoginController);
     
-    LoginController.$inject = ['$auth','$state'];
+    LoginController.$inject = ['$auth','$state','$http', '$rootScope'];
     
     /* @ngInject */
-    function LoginController($auth, $state){
+    function LoginController($auth, $state, $http, $rootScope){
         var vm = this;
         
         vm.email = "";
@@ -488,7 +549,35 @@ c=c.replace(q,function(a){p=a;return""});e=e||{};t(m.urlParams,function(a,b){h=e
             // Use Satellizer's $auth service to login
             $auth.login(credentials).then(function(data) {
                 // If login is successful, redirect to dashboard state
-                $state.go('dashboard', {});
+                return $http.get('api/authenticate/user');
+                
+            }, function(error) {
+                vm.loginError = true;
+                vm.loginErrorText = error.data.error;
+
+            // Because we returned the $http.get request in the $auth.login
+            // promise, we can chain the next promise to the end here
+            }).then(function(response) {
+
+                // Stringify the returned data to prepare it
+                // to go into local storage
+                var user = JSON.stringify(response.data.user);
+
+                // Set the stringified user data into local storage
+                localStorage.setItem('user', user);
+
+                // The user's authenticated state gets flipped to
+                // true so we can now show parts of the UI that rely
+                // on the user being logged in
+                $rootScope.authenticated = true;
+
+                // Putting the user's data on $rootScope allows
+                // us to access it anywhere across the app
+                $rootScope.currentUser = response.data.user;
+
+                // Everything worked out so we can now redirect to
+                // the users state to view the data
+                $state.go('dashboard');
             });
         }
     }
@@ -499,30 +588,14 @@ c=c.replace(q,function(a){p=a;return""});e=e||{};t(m.urlParams,function(a,b){h=e
     angular.module('app')
             .controller('DashboardController', DashboardController);
     
-    DashboardController.$inject = ['usersPrepService','$auth'];
+    DashboardController.$inject = ['usersPrepService'];
     
-    function DashboardController(usersPrepService, $auth){
+    /* @ngInject */
+    function DashboardController(usersPrepService){
         var vm = this;
         vm.users = usersPrepService.users;
         vm.error = usersPrepService.errors;
-        vm.logout = logout;
         
-        /////////////
-        
-        function logout(){
-            $auth.logout().then(function() {
-
-                // Remove the authenticated user from local storage
-                //localStorage.removeItem('user');
-
-                // Flip authenticated to false so that we no longer
-                // show UI elements dependant on the user being logged in
-                //$rootScope.authenticated = false;
-
-                // Remove the current user info from rootscope
-                //$rootScope.currentUser = null;
-            });
-        }
     }
 })();
 (function(){
