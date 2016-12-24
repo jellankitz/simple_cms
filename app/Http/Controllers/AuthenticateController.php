@@ -6,22 +6,11 @@ use Illuminate\Http\Request;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Cartalyst\Sentinel\Native\Facades\Sentinel;
-use App\User;
 
 class AuthenticateController extends Controller {
 
     public function __construct() {
         $this->middleware('jwt.auth', ['except' => ['authenticate']]);
-    }
-
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index() {
-        $users = User::all();
-        return $users;
     }
 
     public function authenticate(Request $request) {
