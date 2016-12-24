@@ -4,12 +4,14 @@
     angular.module('app')
             .controller('NavController', NavController);
     
-    NavController.$inject = ['$auth', '$rootScope']
+    NavController.$inject = ['$auth', '$rootScope', 'navPrepService']
     
     /* @ngInject */
-    function NavController($auth, $rootScope){
+    function NavController($auth, $rootScope, navPrepService){
         var vm = this;
         vm.logout = logout;
+        vm.navs = navPrepService.navs;
+        vm.error = navPrepService.errors;
         
         /////////////
         

@@ -2,33 +2,33 @@
     'use strict';
     
     angular.module('app')
-            .factory('UserService', UserService);
+            .factory('NavService', NavService);
     
-    UserService.$inject = ['$http', 'CONST', '$q'];
+    NavService.$inject = ['$http', 'CONST', '$q'];
     
     /* @ngInject */
-    function UserService($http, CONST, $q){
-        var api = CONST.api_domain + 'authenticate/';
+    function NavService($http, CONST, $q){
+        var api = CONST.api_domain + 'nav/';
         var d = $q.defer();
         
         var service = {
-            users: {},
+            navs: {},
             errors: {},
-            getUsers: getUsers
+            getNavs: getNavs
         }
         
         return service;
         
         ////////////////
         
-        function getUsers(){
+        function getNavs(){
             $http.get(api)
                     .then(success)
                     .catch(error);
         }
         
         function success(data){
-            service.users = data.data;
+            service.navs = data.data;
             d.resolve();
             return d.promise;
         }

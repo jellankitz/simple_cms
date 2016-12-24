@@ -14,6 +14,16 @@
 
         // For any unmatched url, redirect to /login 
         $urlRouterProvider.otherwise("/auth");
+        
+        //admin navigation menu
+        var nav = {
+            templateUrl: "./admin/app/nav/nav.html",
+            controller: "NavController",
+            controllerAs: "vm",
+            resolve: {
+                navPrepService: navPrepService
+            }
+        };
 
         $stateProvider
                 .state("auth", {
@@ -38,18 +48,21 @@
                                 usersPrepService: usersPrepService
                             }
                         },
-                        "nav": {
-                            templateUrl: "./admin/app/nav/nav.html",
-                            controller: "NavController",
-                            controllerAs: "vm"
-                        }
+                        "nav": nav
                     }
                 });
 
         $resourceProvider.defaults.stripTrailingSlashes = false;
 
         ////////////
-
+        
+        navPrepService.$inject = ['NavService'];
+        /* @ngInject */
+        function navPrepService(NavService){
+            NavService.getNavs();
+            return NavService;
+        }
+        
         usersPrepService.$inject = ['UserService'];
         /* @ngInject */
         function usersPrepService(UserService) {

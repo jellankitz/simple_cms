@@ -392,6 +392,16 @@ c=c.replace(q,function(a){p=a;return""});e=e||{};t(m.urlParams,function(a,b){h=e
 
         // For any unmatched url, redirect to /login 
         $urlRouterProvider.otherwise("/auth");
+        
+        //admin navigation menu
+        var nav = {
+            templateUrl: "./admin/app/nav/nav.html",
+            controller: "NavController",
+            controllerAs: "vm",
+            resolve: {
+                navPrepService: navPrepService
+            }
+        };
 
         $stateProvider
                 .state("auth", {
@@ -416,18 +426,21 @@ c=c.replace(q,function(a){p=a;return""});e=e||{};t(m.urlParams,function(a,b){h=e
                                 usersPrepService: usersPrepService
                             }
                         },
-                        "nav": {
-                            templateUrl: "./admin/app/nav/nav.html",
-                            controller: "NavController",
-                            controllerAs: "vm"
-                        }
+                        "nav": nav
                     }
                 });
 
         $resourceProvider.defaults.stripTrailingSlashes = false;
 
         ////////////
-
+        
+        navPrepService.$inject = ['NavService'];
+        /* @ngInject */
+        function navPrepService(NavService){
+            NavService.getNavs();
+            return NavService;
+        }
+        
         usersPrepService.$inject = ['UserService'];
         /* @ngInject */
         function usersPrepService(UserService) {
@@ -497,12 +510,14 @@ c=c.replace(q,function(a){p=a;return""});e=e||{};t(m.urlParams,function(a,b){h=e
     angular.module('app')
             .controller('NavController', NavController);
     
-    NavController.$inject = ['$auth', '$rootScope']
+    NavController.$inject = ['$auth', '$rootScope', 'navPrepService']
     
     /* @ngInject */
-    function NavController($auth, $rootScope){
+    function NavController($auth, $rootScope, navPrepService){
         var vm = this;
         vm.logout = logout;
+        vm.navs = navPrepService.navs;
+        vm.error = navPrepService.errors;
         
         /////////////
         
@@ -520,6 +535,49 @@ c=c.replace(q,function(a){p=a;return""});e=e||{};t(m.urlParams,function(a,b){h=e
             });
         }
     }
+})();
+(function(){
+    'use strict';
+    
+    angular.module('app')
+            .factory('NavService', NavService);
+    
+    NavService.$inject = ['$http', 'CONST', '$q'];
+    
+    /* @ngInject */
+    function NavService($http, CONST, $q){
+        var api = CONST.api_domain + 'nav/';
+        var d = $q.defer();
+        
+        var service = {
+            navs: {},
+            errors: {},
+            getNavs: getNavs
+        }
+        
+        return service;
+        
+        ////////////////
+        
+        function getNavs(){
+            $http.get(api)
+                    .then(success)
+                    .catch(error);
+        }
+        
+        function success(data){
+            service.navs = data.data;
+            d.resolve();
+            return d.promise;
+        }
+        
+        function error(error){
+            service.errors = error;
+            d.reject();
+            return d.promise;
+        }
+    }
+    
 })();
 (function(){
     'use strict';
@@ -623,6 +681,7 @@ c=c.replace(q,function(a){p=a;return""});e=e||{};t(m.urlParams,function(a,b){h=e
     function UserService($http, CONST, $q){
         var api = CONST.api_domain + 'authenticate/';
         var d = $q.defer();
+        
         var service = {
             users: {},
             errors: {},
