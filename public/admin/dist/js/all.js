@@ -463,9 +463,9 @@ c=c.replace(q,function(a){p=a;return""});e=e||{};t(m.urlParams,function(a,b){h=e
         }
     }
 
-    run.$inject = ['$rootScope', '$state'];
+    run.$inject = ['$rootScope', '$state', '$auth'];
     /* @ngInject */
-    function run($rootScope, $state) {
+    function run($rootScope, $state, $auth) {
         // $stateChangeStart is fired whenever the state changes. We can use some parameters
         // such as toState to hook into details about the state as it is changing
         $rootScope.$on('$stateChangeStart', function (event, toState) {
@@ -477,7 +477,7 @@ c=c.replace(q,function(a){p=a;return""});e=e||{};t(m.urlParams,function(a,b){h=e
             // likely authenticated. If their token is expired, or if they are
             // otherwise not actually authenticated, they will be redirected to
             // the auth state because of the rejected request anyway
-            if (user) {
+            if (user && $auth.isAuthenticated()) {
 
                 // The user's authenticated state gets flipped to
                 // true so we can now show parts of the UI that rely
@@ -500,6 +500,15 @@ c=c.replace(q,function(a){p=a;return""});e=e||{};t(m.urlParams,function(a,b){h=e
                     // go to the "main" state which in our case is users
                     $state.go('dashboard');
                 }
+            }else{
+                // Remove the authenticated user from local storage
+                localStorage.removeItem('user');
+                // Flip authenticated to false so that we no longer
+                // show UI elements dependant on the user being logged in
+                $rootScope.authenticated = false;
+
+                // Remove the current user info from rootscope
+                $rootScope.currentUser = null;
             }
         });
     }
@@ -679,7 +688,7 @@ c=c.replace(q,function(a){p=a;return""});e=e||{};t(m.urlParams,function(a,b){h=e
     
     /* @ngInject */
     function UserService($http, CONST, $q){
-        var api = CONST.api_domain + 'authenticate/';
+        var api = CONST.api_domain + 'user/';
         var d = $q.defer();
         
         var service = {

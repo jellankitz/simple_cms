@@ -8,7 +8,7 @@
     
     /* @ngInject */
     function UserService($http, CONST, $q){
-        var api = CONST.api_domain + 'authenticate/';
+        var api = CONST.api_domain + 'user/';
         var d = $q.defer();
         
         var service = {
