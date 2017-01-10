@@ -6,6 +6,9 @@
                     <h3 class="panel-title">Please Sign In</h3>
                 </div>
                 <div class="panel-body">
+                    <div class="alert alert-danger" ng-show="vm.loginErrorText">
+                        <strong>Error!</strong> {{ vm.loginErrorText }}
+                    </div>
                     <form role="form">
                         <fieldset>
                             <div class="form-group">

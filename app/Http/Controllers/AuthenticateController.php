@@ -20,11 +20,20 @@ class AuthenticateController extends Controller {
         try {
             // verify the credentials and create a token for the user
             if (!$user = Sentinel::authenticate($credentials)) {
-                return response()->json(['error' => 'invalid_credentials'], 401);
+                return response()->json(['error' => 'Invalid email or password'], 401);
             }
         } catch (JWTException $e) {
             // something went wrong
-            return response()->json(['error' => 'could_not_create_token'], 500);
+            return response()->json(["error" => "Unable to create token."], 500);
+        }
+        // Following is only needed if throttle is enabled
+        catch (Cartalyst\Sentry\Throttling\UserSuspendedException $e) {
+            $time = $e->getSuspensionTime();
+            
+            return response()->json(["error" => "User is suspended for [$time] minutes."], 500);
+        }
+        catch(\Exception $e){
+            return response()->json(["error" => $e->getMessage()], 500);
         }
 
         // if no errors are encountered we can return a JWT

@@ -25,3 +25,4 @@ Route::group(['prefix' => 'nav'], function () {
 Route::group(['prefix' => 'user'], function () {
     Route::get('/', 'UserController@index');
 });
+

@@ -31,11 +31,14 @@
             }, function(error) {
                 vm.loginError = true;
                 vm.loginErrorText = error.data.error;
-
+                
+                return false;
             // Because we returned the $http.get request in the $auth.login
             // promise, we can chain the next promise to the end here
             }).then(function(response) {
-
+                if(response === false){
+                    return false;
+                }
                 // Stringify the returned data to prepare it
                 // to go into local storage
                 var user = JSON.stringify(response.data.user);
