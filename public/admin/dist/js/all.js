@@ -861,7 +861,7 @@ c=c.replace(q,function(a){p=a;return""});e=e||{};t(m.urlParams,function(a,b){h=e
         var vm = this;
         vm.posts = postPrepService.posts;
         vm.error = postPrepService.errors;
-        
+        //console.log(vm.posts);
     }
 })();
 (function(){

@@ -10,12 +10,20 @@
                             <tr>
                                 <th>Title</th>
                                 <th>Slug</th>
+                                <th>Category</th>
+                                <th>Tags</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr ng-if="vm.posts"  ng-repeat="post in vm.posts">
                                 <td>{{post.title}}</td>
                                 <td>{{post.slug}}</td>
+                                <td>{{post.category.name}}</td>
+                                <td>
+                                    <span ng-repeat="tag in post.tags">
+                                        {{tag.name}}<span ng-if="!$last">,</span>
+                                    </span>
+                                </td>
                             </tr>
                             <tr ng-if="!vm.posts">
                                 <td colspan="2">

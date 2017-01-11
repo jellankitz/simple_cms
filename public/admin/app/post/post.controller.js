@@ -11,6 +11,6 @@
         var vm = this;
         vm.posts = postPrepService.posts;
         vm.error = postPrepService.errors;
-        
+        //console.log(vm.posts);
     }
 })();
