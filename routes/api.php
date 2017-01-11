@@ -26,3 +26,14 @@ Route::group(['prefix' => 'user'], function () {
     Route::get('/', 'UserController@index');
 });
 
+Route::group(['prefix' => 'post'], function () {
+    Route::get('/', 'PostController@index');
+});
+
+Route::group(['prefix' => 'category'], function () {
+    Route::get('/', 'CategoryController@index');
+});
+
+Route::group(['prefix' => 'tag'], function () {
+    Route::get('/', 'TagController@index');
+});

@@ -50,6 +50,48 @@
                         },
                         "nav": nav
                     }
+                }).state("post", {
+                    url: "/post",
+                    views: {
+                        "main": {
+                            templateUrl: "./admin/app/post/post.html",
+                            controller: "PostController",
+                            controllerAs: "vm",
+                            resolve: {
+                                auth: doAuth,
+                                postPrepService: postPrepService
+                            }
+                        },
+                        "nav": nav
+                    }
+                }).state("category", {
+                    url: "/category",
+                    views: {
+                        "main": {
+                            templateUrl: "./admin/app/category/category.html",
+                            controller: "CategoryController",
+                            controllerAs: "vm",
+                            resolve: {
+                                auth: doAuth,
+                                categoryPrepService: categoryPrepService
+                            }
+                        },
+                        "nav": nav
+                    }
+                }).state("tag", {
+                    url: "/tag",
+                    views: {
+                        "main": {
+                            templateUrl: "./admin/app/tag/tag.html",
+                            controller: "TagController",
+                            controllerAs: "vm",
+                            resolve: {
+                                auth: doAuth,
+                                tagPrepService: tagPrepService
+                            }
+                        },
+                        "nav": nav
+                    }
                 });
 
         $resourceProvider.defaults.stripTrailingSlashes = false;
@@ -69,7 +111,28 @@
             UserService.getUsers();
             return UserService;
         }
-
+        
+        postPrepService.$inject = ['PostService'];
+        /* @ngInject */
+        function postPrepService(PostService){
+            PostService.getPosts();
+            return PostService;
+        }
+        
+        categoryPrepService.$inject = ['CategoryService'];
+        /* @ngInject */
+        function categoryPrepService(CategoryService){
+            CategoryService.getCategories();
+            return CategoryService;
+        }
+        
+        tagPrepService.$inject = ['TagService'];
+        /* @ngInject */
+        function tagPrepService(TagService){
+            TagService.getTags();
+            return TagService;
+        }
+        
         doAuth.$inject = ['$auth', '$q', '$injector'];
         /* @ngInject */
         function doAuth($auth, $q, $injector) {

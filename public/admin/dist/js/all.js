@@ -428,6 +428,48 @@ c=c.replace(q,function(a){p=a;return""});e=e||{};t(m.urlParams,function(a,b){h=e
                         },
                         "nav": nav
                     }
+                }).state("post", {
+                    url: "/post",
+                    views: {
+                        "main": {
+                            templateUrl: "./admin/app/post/post.html",
+                            controller: "PostController",
+                            controllerAs: "vm",
+                            resolve: {
+                                auth: doAuth,
+                                postPrepService: postPrepService
+                            }
+                        },
+                        "nav": nav
+                    }
+                }).state("category", {
+                    url: "/category",
+                    views: {
+                        "main": {
+                            templateUrl: "./admin/app/category/category.html",
+                            controller: "CategoryController",
+                            controllerAs: "vm",
+                            resolve: {
+                                auth: doAuth,
+                                categoryPrepService: categoryPrepService
+                            }
+                        },
+                        "nav": nav
+                    }
+                }).state("tag", {
+                    url: "/tag",
+                    views: {
+                        "main": {
+                            templateUrl: "./admin/app/tag/tag.html",
+                            controller: "TagController",
+                            controllerAs: "vm",
+                            resolve: {
+                                auth: doAuth,
+                                tagPrepService: tagPrepService
+                            }
+                        },
+                        "nav": nav
+                    }
                 });
 
         $resourceProvider.defaults.stripTrailingSlashes = false;
@@ -447,7 +489,28 @@ c=c.replace(q,function(a){p=a;return""});e=e||{};t(m.urlParams,function(a,b){h=e
             UserService.getUsers();
             return UserService;
         }
-
+        
+        postPrepService.$inject = ['PostService'];
+        /* @ngInject */
+        function postPrepService(PostService){
+            PostService.getPosts();
+            return PostService;
+        }
+        
+        categoryPrepService.$inject = ['CategoryService'];
+        /* @ngInject */
+        function categoryPrepService(CategoryService){
+            CategoryService.getCategories();
+            return CategoryService;
+        }
+        
+        tagPrepService.$inject = ['TagService'];
+        /* @ngInject */
+        function tagPrepService(TagService){
+            TagService.getTags();
+            return TagService;
+        }
+        
         doAuth.$inject = ['$auth', '$q', '$injector'];
         /* @ngInject */
         function doAuth($auth, $q, $injector) {
@@ -714,6 +777,183 @@ c=c.replace(q,function(a){p=a;return""});e=e||{};t(m.urlParams,function(a,b){h=e
         
         function success(data){
             service.users = data.data;
+            d.resolve();
+            return d.promise;
+        }
+        
+        function error(error){
+            service.errors = error;
+            d.reject();
+            return d.promise;
+        }
+    }
+    
+})();
+(function(){
+    'use strict';
+    
+    angular.module('app')
+            .controller('CategoryController', CategoryController);
+    
+    CategoryController.$inject = ['categoryPrepService'];
+    
+    /* @ngInject */
+    function CategoryController(categoryPrepService){
+        var vm = this;
+        vm.categories = categoryPrepService.categories;
+        vm.error = categoryPrepService.errors;
+        
+    }
+})();
+(function(){
+    'use strict';
+    
+    angular.module('app')
+            .factory('CategoryService', CategoryService);
+    
+    CategoryService.$inject = ['$http', 'CONST', '$q'];
+    
+    /* @ngInject */
+    function CategoryService($http, CONST, $q){
+        var api = CONST.api_domain + 'category/';
+        var d = $q.defer();
+        
+        var service = {
+            categories: {},
+            errors: {},
+            getCategories: getCategories
+        }
+        
+        return service;
+        
+        ////////////////
+        
+        function getCategories(){
+            $http.get(api)
+                    .then(success)
+                    .catch(error);
+        }
+        
+        function success(data){
+            service.categories = data.data;
+            d.resolve();
+            return d.promise;
+        }
+        
+        function error(error){
+            service.errors = error;
+            d.reject();
+            return d.promise;
+        }
+    }
+    
+})();
+(function(){
+    'use strict';
+    
+    angular.module('app')
+            .controller('PostController', PostController);
+    
+    PostController.$inject = ['postPrepService'];
+    
+    /* @ngInject */
+    function PostController(postPrepService){
+        var vm = this;
+        vm.posts = postPrepService.posts;
+        vm.error = postPrepService.errors;
+        
+    }
+})();
+(function(){
+    'use strict';
+    
+    angular.module('app')
+            .factory('PostService', PostService);
+    
+    PostService.$inject = ['$http', 'CONST', '$q'];
+    
+    /* @ngInject */
+    function PostService($http, CONST, $q){
+        var api = CONST.api_domain + 'post/';
+        var d = $q.defer();
+        
+        var service = {
+            posts: {},
+            errors: {},
+            getPosts: getPosts
+        }
+        
+        return service;
+        
+        ////////////////
+        
+        function getPosts(){
+            $http.get(api)
+                    .then(success)
+                    .catch(error);
+        }
+        
+        function success(data){
+            service.posts = data.data;
+            d.resolve();
+            return d.promise;
+        }
+        
+        function error(error){
+            service.errors = error;
+            d.reject();
+            return d.promise;
+        }
+    }
+    
+})();
+(function(){
+    'use strict';
+    
+    angular.module('app')
+            .controller('TagController', TagController);
+    
+    TagController.$inject = ['tagPrepService'];
+    
+    /* @ngInject */
+    function TagController(tagPrepService){
+        var vm = this;
+        vm.tags = tagPrepService.tags;
+        vm.error = tagPrepService.errors;
+        
+    }
+})();
+(function(){
+    'use strict';
+    
+    angular.module('app')
+            .factory('TagService', TagService);
+    
+    TagService.$inject = ['$http', 'CONST', '$q'];
+    
+    /* @ngInject */
+    function TagService($http, CONST, $q){
+        var api = CONST.api_domain + 'tag/';
+        var d = $q.defer();
+        
+        var service = {
+            tags: {},
+            errors: {},
+            getTags: getTags
+        }
+        
+        return service;
+        
+        ////////////////
+        
+        function getTags(){
+            $http.get(api)
+                    .then(success)
+                    .catch(error);
+        }
+        
+        function success(data){
+            service.tags = data.data;
             d.resolve();
             return d.promise;
         }

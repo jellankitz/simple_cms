@@ -14,7 +14,10 @@ gulp.task('scripts', function() {
       './app/nav/*.js',
       './app/login/*.js',
       './app/dashboard/*.js',
-      './app/user/*.js'
+      './app/user/*.js',
+      './app/category/*.js',
+      './app/post/*.js',
+      './app/tag/*.js'
   ])
     .pipe(concat('all.js'))
     .pipe(gulp.dest('./dist/js/'));
