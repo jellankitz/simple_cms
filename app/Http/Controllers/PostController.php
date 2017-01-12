@@ -5,28 +5,25 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Post;
 use App\Tag;
+use Cartalyst\Sentinel\Native\Facades\Sentinel;
+use App\Helpers\Helper;
 
-class PostController extends Controller
-{
+class PostController extends Controller {
+
+    private $post = null;
+
+    public function __construct(Post $post) {
+        $this->post = $post;
+    }
+
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
-    {
-        $posts = Post::with('category')->with('tags')->get();
+    public function index() {
+        $posts = $this->post->with('category')->with('tags')->get();
         return $posts;
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
     }
 
     /**
@@ -35,9 +32,20 @@ class PostController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
-    {
-        //
+    public function store(Request $request) {
+        $data = $request->all();
+        $user = Sentinel::getUser();
+
+        $data['user_id'] = $user->id;
+        $data['slug'] = Helper::getSlug($data['title']);
+        
+        try {
+            $newPost = $this->post->create($data);
+
+            return response()->json(['success' => 1, 'new_post' => $newPost], 200);
+        } catch (Exception $ex) {
+            return response()->json(['success' => 0, 'message' => 'Something went wrong'], 500);
+        }
     }
 
     /**
@@ -46,8 +54,7 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
-    {
+    public function show($id) {
         //
     }
 
@@ -57,8 +64,7 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
-    {
+    public function edit($id) {
         //
     }
 
@@ -69,8 +75,7 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
-    {
+    public function update(Request $request, $id) {
         //
     }
 
@@ -80,8 +85,8 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
-    {
+    public function destroy($id) {
         //
     }
+
 }

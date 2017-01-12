@@ -14,12 +14,23 @@
         var service = {
             posts: {},
             errors: {},
-            getPosts: getPosts
+            getPosts: getPosts,
+            addPost: addPost
         }
         
         return service;
         
         ////////////////
+        
+        function addPost(data) {
+            var addurl = api+"add/";
+            
+            $http.post(addurl, data)
+                    .then(function (resp) {
+                        d.resolve();
+                        return d.promise;
+                    }).catch(error);
+        }
         
         function getPosts(){
             $http.get(api)
@@ -34,6 +45,7 @@
         }
         
         function error(error){
+            console.log(error.data);
             service.errors = error;
             d.reject();
             return d.promise;

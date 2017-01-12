@@ -11,6 +11,14 @@
         var vm = this;
         vm.posts = postPrepService.posts;
         vm.error = postPrepService.errors;
-        //console.log(vm.posts);
+        vm.isAddPost = false;
+        
+        vm.toggleAddForm = toggleAddForm;
+        
+        ////////////////
+        
+        function toggleAddForm(){
+            vm.isAddPost = !vm.isAddPost;
+        }
     }
 })();

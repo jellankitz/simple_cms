@@ -5,147 +5,14 @@
             .config(config)
             .run(run);
 
-    config.$inject = ['$stateProvider', '$urlRouterProvider', '$authProvider', '$resourceProvider'];
+    config.$inject = ['$authProvider', '$resourceProvider'];
 
     /* @ngInject */
-    function config($stateProvider, $urlRouterProvider, $authProvider, $resourceProvider) {
+    function config($authProvider, $resourceProvider) {
 
         $authProvider.loginUrl = 'http://localhost:8000/api/authenticate';
-
-        // For any unmatched url, redirect to /login 
-        $urlRouterProvider.otherwise("/auth");
-        
-        //admin navigation menu
-        var nav = {
-            templateUrl: "./admin/app/nav/nav.html",
-            controller: "NavController",
-            controllerAs: "vm",
-            resolve: {
-                navPrepService: navPrepService
-            }
-        };
-
-        $stateProvider
-                .state("auth", {
-                    url: "/auth",
-                    views: {
-                        "main": {
-                            templateUrl: "./admin/app/login/login.html",
-                            controller: "LoginController",
-                            controllerAs: "vm"
-                        }
-                    }
-                })
-                .state("dashboard", {
-                    url: "/dashboard",
-                    views: {
-                        "main": {
-                            templateUrl: "./admin/app/dashboard/dashboard.html",
-                            controller: "DashboardController",
-                            controllerAs: "vm",
-                            resolve: {
-                                auth: doAuth,
-                                usersPrepService: usersPrepService
-                            }
-                        },
-                        "nav": nav
-                    }
-                }).state("post", {
-                    url: "/post",
-                    views: {
-                        "main": {
-                            templateUrl: "./admin/app/post/post.html",
-                            controller: "PostController",
-                            controllerAs: "vm",
-                            resolve: {
-                                auth: doAuth,
-                                postPrepService: postPrepService
-                            }
-                        },
-                        "nav": nav
-                    }
-                }).state("category", {
-                    url: "/category",
-                    views: {
-                        "main": {
-                            templateUrl: "./admin/app/category/category.html",
-                            controller: "CategoryController",
-                            controllerAs: "vm",
-                            resolve: {
-                                auth: doAuth,
-                                categoryPrepService: categoryPrepService
-                            }
-                        },
-                        "nav": nav
-                    }
-                }).state("tag", {
-                    url: "/tag",
-                    views: {
-                        "main": {
-                            templateUrl: "./admin/app/tag/tag.html",
-                            controller: "TagController",
-                            controllerAs: "vm",
-                            resolve: {
-                                auth: doAuth,
-                                tagPrepService: tagPrepService
-                            }
-                        },
-                        "nav": nav
-                    }
-                });
-
         $resourceProvider.defaults.stripTrailingSlashes = false;
 
-        ////////////
-        
-        navPrepService.$inject = ['NavService'];
-        /* @ngInject */
-        function navPrepService(NavService){
-            NavService.getNavs();
-            return NavService;
-        }
-        
-        usersPrepService.$inject = ['UserService'];
-        /* @ngInject */
-        function usersPrepService(UserService) {
-            UserService.getUsers();
-            return UserService;
-        }
-        
-        postPrepService.$inject = ['PostService'];
-        /* @ngInject */
-        function postPrepService(PostService){
-            PostService.getPosts();
-            return PostService;
-        }
-        
-        categoryPrepService.$inject = ['CategoryService'];
-        /* @ngInject */
-        function categoryPrepService(CategoryService){
-            CategoryService.getCategories();
-            return CategoryService;
-        }
-        
-        tagPrepService.$inject = ['TagService'];
-        /* @ngInject */
-        function tagPrepService(TagService){
-            TagService.getTags();
-            return TagService;
-        }
-        
-        doAuth.$inject = ['$auth', '$q', '$injector'];
-        /* @ngInject */
-        function doAuth($auth, $q, $injector) {
-            var deferred = $q.defer();
-            var $state = $injector.get('$state');
-            if ($auth.isAuthenticated()) {
-                deferred.resolve();
-            } else {
-                deferred.reject();
-                $state.go('auth');
-            }
-            return deferred.promise;
-        }
     }
 
     run.$inject = ['$rootScope', '$state', '$auth'];

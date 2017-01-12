@@ -15,7 +15,7 @@ class NavigationsTableSeeder extends Seeder
         
         $navs = array(
             [
-                "name" => "Home",
+                "name" => "Dashboard",
                 "link" => "dashboard",
                 "icon" => "fa-dashboard",
                 "visible" => 1

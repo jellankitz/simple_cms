@@ -19,7 +19,7 @@ class CreatePostTable extends Migration
             $table->string('title');
             $table->string('slug');
             $table->longText('content');
-            $table->integer('category_id')->unsigned();
+            $table->integer('category_id')->unsigned()->default(1);
             $table->timestamps();
         });
     }

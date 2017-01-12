@@ -185,6 +185,11 @@ return [
          */
         Cartalyst\Sentinel\Laravel\SentinelServiceProvider::class,
         Tymon\JWTAuth\Providers\JWTAuthServiceProvider::class,
+        
+        /*
+         * My Providers
+         */
+        
     ],
 
     /*

@@ -11,6 +11,8 @@ gulp.task('scripts', function() {
       './app/app.module.js',
       './app/constants.js',
       './app/app.config.js',
+      './app/app.route.js',
+      './app/app.global.js',
       './app/nav/*.js',
       './app/login/*.js',
       './app/dashboard/*.js',

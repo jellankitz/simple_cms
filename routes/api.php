@@ -26,10 +26,6 @@ Route::group(['prefix' => 'user'], function () {
     Route::get('/', 'UserController@index');
 });
 
-Route::group(['prefix' => 'post'], function () {
-    Route::get('/', 'PostController@index');
-});
-
 Route::group(['prefix' => 'category'], function () {
     Route::get('/', 'CategoryController@index');
 });
