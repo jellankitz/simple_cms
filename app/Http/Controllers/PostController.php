@@ -7,6 +7,7 @@ use App\Post;
 use App\Tag;
 use Cartalyst\Sentinel\Native\Facades\Sentinel;
 use App\Helpers\Helper;
+use Illuminate\Support\Facades\Log;
 
 class PostController extends Controller {
 
@@ -22,7 +23,9 @@ class PostController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function index() {
-        $posts = $this->post->with('category')->with('tags')->get();
+        $posts = $this->post->with('category')
+                ->with('tags')
+                ->get();
         return $posts;
     }
 
@@ -37,11 +40,18 @@ class PostController extends Controller {
         $user = Sentinel::getUser();
 
         $data['user_id'] = $user->id;
-        $data['slug'] = Helper::getSlug($data['title']);
-        
+        $slug = Helper::getSlug($data['title'],$this->post);
+        $data['slug'] = $slug;
+        $data['category'] = isset($data['category']) ? $data['category'] : 1;
+                
         try {
-            $newPost = $this->post->create($data);
-
+            $insert = $this->post->create($data);
+            $newPost = $this->post
+                    ->with('category')
+                    ->with('tags')
+                    ->where('id','=',$insert->id)
+                    ->first();
+            
             return response()->json(['success' => 1, 'new_post' => $newPost], 200);
         } catch (Exception $ex) {
             return response()->json(['success' => 0, 'message' => 'Something went wrong'], 500);
@@ -55,16 +65,6 @@ class PostController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function show($id) {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id) {
         //
     }
 
@@ -86,7 +86,20 @@ class PostController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function destroy($id) {
-        //
+        try{
+            $exist = $this->post->find($id);
+            
+            if(!$exist){
+                return response()->json(['msg' => 'Post id not exisiting.'],400);
+            }
+            
+            $exist->delete();
+            
+            return response()->json(['success' => 1, 'message' => 'Deleted post successfully!'], 200);
+            
+        } catch (Exception $ex) {
+            return response()->json(['success' => 0, 'message' => 'Something went wrong'], 500);
+        }
     }
 
 }

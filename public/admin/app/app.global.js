@@ -10,7 +10,9 @@
     function HelperService($state){
         var service = {
             getCurrentState: getCurrentState,
-            getPrevState: getPrevState
+            getPrevState: getPrevState,
+            removeFromList: removeFromList,
+            addToList: addToList
         }
         
         return service;
@@ -29,6 +31,22 @@
             }
             
             return false;
+        }
+        
+        function removeFromList(attr, id){
+            for(var x = 0; x < attr.length; x++){
+                if(attr[x].id == id){
+                    attr.splice(x,1);
+                }
+            }
+            
+            return attr;
+        }
+        
+        function addToList(attr, newData){
+            attr.push(newData);
+            
+            return attr;
         }
     }
     

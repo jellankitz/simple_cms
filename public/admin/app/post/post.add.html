@@ -17,6 +17,9 @@
             <div class="panel-body">
                 <div class="row">
                     <div class="col-lg-12">
+                        <div class="alert {{vm.response.success}}" ng-if="vm.hasAdded">
+                            <strong>{{vm.response.alert}}</strong> {{vm.response.msg}}
+                        </div>
                         <form role="form" ng-submit="vm.addPost()">
                             <div class="form-group">
                                 <label>Title</label>

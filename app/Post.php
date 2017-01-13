@@ -14,6 +14,7 @@ class Post extends Model {
         'user_id',
         'title',
         'slug',
+        'oslug',
         'content',
         'category_id',
         'created_at',

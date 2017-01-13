@@ -10,15 +10,54 @@
     function PostController(postPrepService){
         var vm = this;
         vm.posts = postPrepService.posts;
+        console.log(postPrepService);
+        console.log(vm.posts);
         vm.error = postPrepService.errors;
-        vm.isAddPost = false;
+        vm.hasDeleted = false;
+        vm.response = {};
         
-        vm.toggleAddForm = toggleAddForm;
+        vm.deletePost = deletePost;
         
         ////////////////
         
-        function toggleAddForm(){
-            vm.isAddPost = !vm.isAddPost;
+        function deletePost(post) {
+            bootbox.confirm({
+                title: "Confirm Delete",
+                message: "Are you sure you want to delete post: " + post.title + "?",
+                buttons: {
+                    confirm: {
+                        label: 'Yes',
+                        className: 'btn-success'
+                    },
+                    cancel: {
+                        label: 'No',
+                        className: 'btn-danger'
+                    }
+                },
+                callback: function (result) {
+                    if(result){
+                        doDelete(post.id);
+                    }
+                }
+            });
+            
+        }
+        
+        function doDelete(id){
+            postPrepService.deletePost(id).then(function (resp) {
+                vm.hasDeleted = true;
+                vm.response['success'] = "alert-success";
+                vm.response['alert'] = "Success!";
+                vm.response['msg'] = resp.data.message;
+                vm.posts = postPrepService.posts;
+                console.log(vm.posts);
+                vm.hasAdded = true;
+            }).catch(function () {
+                vm.response['success'] = "alert-danger";
+                vm.response['alert'] = "Error!";
+                vm.response['msg'] = "Failed to delete post.";
+                vm.hasAdded = true;
+            });
         }
     }
 })();

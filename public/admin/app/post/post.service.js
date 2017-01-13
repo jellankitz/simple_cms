@@ -1,55 +1,87 @@
-(function(){
+(function () {
     'use strict';
-    
+
     angular.module('app')
             .factory('PostService', PostService);
-    
-    PostService.$inject = ['$http', 'CONST', '$q'];
-    
+
+    PostService.$inject = ['$http', 'CONST', '$q', 'HelperService'];
+
     /* @ngInject */
-    function PostService($http, CONST, $q){
+    function PostService($http, CONST, $q, HelperService) {
         var api = CONST.api_domain + 'post/';
-        var d = $q.defer();
-        
+
         var service = {
-            posts: {},
-            errors: {},
+            posts: [],
+            errors: [],
+            addPost: addPost,
+            deletePost: deletePost,
             getPosts: getPosts,
-            addPost: addPost
+            activate: activate
         }
+
+        service.activate();
         
         return service;
         
-        ////////////////
+        //////// SERIVCE METHODS ////////
+        
+        function activate(){
+            return service.getPosts();
+        }
         
         function addPost(data) {
-            var addurl = api+"add/";
-            
-            $http.post(addurl, data)
+            var addUrl = api + "add/";
+            var d = $q.defer();
+
+            $http.post(addUrl, data)
                     .then(function (resp) {
-                        d.resolve();
-                        return d.promise;
-                    }).catch(error);
-        }
-        
-        function getPosts(){
-            $http.get(api)
-                    .then(success)
-                    .catch(error);
-        }
-        
-        function success(data){
-            service.posts = data.data;
-            d.resolve();
+                        console.log(resp);
+                        var newPosts = HelperService.addToList(service.posts, resp.data.new_post);
+                        service.posts = newPosts;
+                        d.resolve(resp);
+                    }).catch(function(error){
+                        console.log(error.data);
+                        service.errors = error;
+                        d.reject(error);
+                    });
+
             return d.promise;
         }
         
-        function error(error){
-            console.log(error.data);
-            service.errors = error;
-            d.reject();
+        function deletePost(id){
+            var deletUrl = api + "delete/" + id;
+            var d = $q.defer();
+            
+            $http.post(deletUrl, {})
+                    .then(function (resp) {
+                        var newPosts = HelperService.removeFromList(service.posts, id);
+                        service.posts = newPosts;
+                        d.resolve(resp);
+                    }).catch(function(error){
+                        console.log(error.data);
+                        service.errors = error;
+                        d.reject(error);
+                    });
+
+            return d.promise;
+        }
+
+        function getPosts() {
+            var d = $q.defer();
+            
+            $http.get(api)
+                    .then(function (data) {
+                        service.posts = data.data;
+                        d.resolve(data);
+                    })
+                    .catch(function (error) {
+                        console.log(error.data);
+                        service.errors = error;
+                        d.reject(error);
+                    });
+
             return d.promise;
         }
     }
-    
+
 })();

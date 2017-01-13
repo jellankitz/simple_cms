@@ -149,7 +149,6 @@
         postPrepService.$inject = ['PostService'];
         /* @ngInject */
         function postPrepService(PostService) {
-            PostService.getPosts();
             return PostService;
         }
 
