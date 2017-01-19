@@ -14,9 +14,11 @@
             posts: [],
             errors: [],
             addPost: addPost,
+            editPost: editPost,
             deletePost: deletePost,
             getPosts: getPosts,
-            activate: activate
+            activate: activate,
+            getPost: getPost
         }
 
         service.activate();
@@ -29,15 +31,60 @@
             return service.getPosts();
         }
         
+        function getPosts() {
+            var d = $q.defer();
+            
+            service.posts = [];
+            
+            $http.get(api)
+                    .then(function (data) {
+                        service.posts = data.data;
+                        d.resolve(data);
+                    })
+                    .catch(function (error) {
+                        console.log(error.data);
+                        service.errors = error;
+                        d.reject(error);
+                    });
+
+            return d.promise;
+        }
+        
+        function getPost(id) {
+            var selId = parseInt(id);
+            for (var i = 0; i < service.posts.length; i++) {
+                var obj = service.posts[i];
+                if (obj.id == selId) {
+                    return obj;
+                }
+
+            }
+        }
+        
         function addPost(data) {
-            var addUrl = api + "add/";
+            var url = api + "add/";
             var d = $q.defer();
 
-            $http.post(addUrl, data)
+            $http.post(url, data)
                     .then(function (resp) {
-                        console.log(resp);
-                        var newPosts = HelperService.addToList(service.posts, resp.data.new_post);
-                        service.posts = newPosts;
+                        HelperService.refreshList(service.posts, resp.data.data);
+                        d.resolve(resp);
+                    }).catch(function(error){
+                        console.log(error.data);
+                        service.errors = error;
+                        d.reject(error);
+                    });
+
+            return d.promise;
+        }
+        
+        function editPost(data) {
+            var url = api + "edit/";
+            var d = $q.defer();
+
+            $http.post(url, data)
+                    .then(function (resp) {
+                        HelperService.refreshList(service.posts, resp.data.data);
                         d.resolve(resp);
                     }).catch(function(error){
                         console.log(error.data);
@@ -49,32 +96,15 @@
         }
         
         function deletePost(id){
-            var deletUrl = api + "delete/" + id;
+            var url = api + "delete/" + id;
             var d = $q.defer();
             
-            $http.post(deletUrl, {})
+            $http.post(url, {})
                     .then(function (resp) {
                         var newPosts = HelperService.removeFromList(service.posts, id);
                         service.posts = newPosts;
                         d.resolve(resp);
                     }).catch(function(error){
-                        console.log(error.data);
-                        service.errors = error;
-                        d.reject(error);
-                    });
-
-            return d.promise;
-        }
-
-        function getPosts() {
-            var d = $q.defer();
-            
-            $http.get(api)
-                    .then(function (data) {
-                        service.posts = data.data;
-                        d.resolve(data);
-                    })
-                    .catch(function (error) {
                         console.log(error.data);
                         service.errors = error;
                         d.reject(error);

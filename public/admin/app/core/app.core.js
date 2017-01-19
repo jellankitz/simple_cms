@@ -5,6 +5,7 @@
         'ngResource',
         'ui.router',
         'satellizer',
+        'jcs-autoValidate',
     ]);
             
 })();

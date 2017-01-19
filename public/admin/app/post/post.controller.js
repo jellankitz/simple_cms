@@ -9,9 +9,8 @@
     /* @ngInject */
     function PostController(postPrepService){
         var vm = this;
+        
         vm.posts = postPrepService.posts;
-        console.log(postPrepService);
-        console.log(vm.posts);
         vm.error = postPrepService.errors;
         vm.hasDeleted = false;
         vm.response = {};
@@ -23,7 +22,7 @@
         function deletePost(post) {
             bootbox.confirm({
                 title: "Confirm Delete",
-                message: "Are you sure you want to delete post: " + post.title + "?",
+                message: "Are you sure you want to delete post: <b>" + post.title + "</b>?",
                 buttons: {
                     confirm: {
                         label: 'Yes',
@@ -46,11 +45,12 @@
         function doDelete(id){
             postPrepService.deletePost(id).then(function (resp) {
                 vm.hasDeleted = true;
+                
                 vm.response['success'] = "alert-success";
                 vm.response['alert'] = "Success!";
                 vm.response['msg'] = resp.data.message;
                 vm.posts = postPrepService.posts;
-                console.log(vm.posts);
+                
                 vm.hasAdded = true;
             }).catch(function () {
                 vm.response['success'] = "alert-danger";

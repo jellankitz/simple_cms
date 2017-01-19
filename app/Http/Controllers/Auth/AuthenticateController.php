@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Auth;
 
 use Illuminate\Http\Request;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Cartalyst\Sentinel\Native\Facades\Sentinel;
+use App\Http\Controllers\Controller;
 
 class AuthenticateController extends Controller {
 

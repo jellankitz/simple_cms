@@ -353,6 +353,12 @@ c=c.replace(q,function(a){p=a;return""});e=e||{};t(m.urlParams,function(a,b){h=e
  * http://bootboxjs.com/license.txt
  */
 !function(a,b){"use strict";"function"==typeof define&&define.amd?define(["jquery"],b):"object"==typeof exports?module.exports=b(require("jquery")):a.bootbox=b(a.jQuery)}(this,function a(b,c){"use strict";function d(a){var b=q[o.locale];return b?b[a]:q.en[a]}function e(a,c,d){a.stopPropagation(),a.preventDefault();var e=b.isFunction(d)&&d.call(c,a)===!1;e||c.modal("hide")}function f(a){var b,c=0;for(b in a)c++;return c}function g(a,c){var d=0;b.each(a,function(a,b){c(a,b,d++)})}function h(a){var c,d;if("object"!=typeof a)throw new Error("Please supply an object of options");if(!a.message)throw new Error("Please specify a message");return a=b.extend({},o,a),a.buttons||(a.buttons={}),c=a.buttons,d=f(c),g(c,function(a,e,f){if(b.isFunction(e)&&(e=c[a]={callback:e}),"object"!==b.type(e))throw new Error("button with key "+a+" must be an object");e.label||(e.label=a),e.className||(e.className=2>=d&&f===d-1?"btn-primary":"btn-default")}),a}function i(a,b){var c=a.length,d={};if(1>c||c>2)throw new Error("Invalid argument length");return 2===c||"string"==typeof a[0]?(d[b[0]]=a[0],d[b[1]]=a[1]):d=a[0],d}function j(a,c,d){return b.extend(!0,{},a,i(c,d))}function k(a,b,c,d){var e={className:"bootbox-"+a,buttons:l.apply(null,b)};return m(j(e,d,c),b)}function l(){for(var a={},b=0,c=arguments.length;c>b;b++){var e=arguments[b],f=e.toLowerCase(),g=e.toUpperCase();a[f]={label:d(g)}}return a}function m(a,b){var d={};return g(b,function(a,b){d[b]=!0}),g(a.buttons,function(a){if(d[a]===c)throw new Error("button key "+a+" is not allowed (options are "+b.join("\n")+")")}),a}var n={dialog:"<div class='bootbox modal' tabindex='-1' role='dialog'><div class='modal-dialog'><div class='modal-content'><div class='modal-body'><div class='bootbox-body'></div></div></div></div></div>",header:"<div class='modal-header'><h4 class='modal-title'></h4></div>",footer:"<div class='modal-footer'></div>",closeButton:"<button type='button' class='bootbox-close-button close' data-dismiss='modal' aria-hidden='true'>&times;</button>",form:"<form class='bootbox-form'></form>",inputs:{text:"<input class='bootbox-input bootbox-input-text form-control' autocomplete=off type=text />",textarea:"<textarea class='bootbox-input bootbox-input-textarea form-control'></textarea>",email:"<input class='bootbox-input bootbox-input-email form-control' autocomplete='off' type='email' />",select:"<select class='bootbox-input bootbox-input-select form-control'></select>",checkbox:"<div class='checkbox'><label><input class='bootbox-input bootbox-input-checkbox' type='checkbox' /></label></div>",date:"<input class='bootbox-input bootbox-input-date form-control' autocomplete=off type='date' />",time:"<input class='bootbox-input bootbox-input-time form-control' autocomplete=off type='time' />",number:"<input class='bootbox-input bootbox-input-number form-control' autocomplete=off type='number' />",password:"<input class='bootbox-input bootbox-input-password form-control' autocomplete='off' type='password' />"}},o={locale:"en",backdrop:"static",animate:!0,className:null,closeButton:!0,show:!0,container:"body"},p={};p.alert=function(){var a;if(a=k("alert",["ok"],["message","callback"],arguments),a.callback&&!b.isFunction(a.callback))throw new Error("alert requires callback property to be a function when provided");return a.buttons.ok.callback=a.onEscape=function(){return b.isFunction(a.callback)?a.callback.call(this):!0},p.dialog(a)},p.confirm=function(){var a;if(a=k("confirm",["cancel","confirm"],["message","callback"],arguments),a.buttons.cancel.callback=a.onEscape=function(){return a.callback.call(this,!1)},a.buttons.confirm.callback=function(){return a.callback.call(this,!0)},!b.isFunction(a.callback))throw new Error("confirm requires a callback");return p.dialog(a)},p.prompt=function(){var a,d,e,f,h,i,k;if(f=b(n.form),d={className:"bootbox-prompt",buttons:l("cancel","confirm"),value:"",inputType:"text"},a=m(j(d,arguments,["title","callback"]),["cancel","confirm"]),i=a.show===c?!0:a.show,a.message=f,a.buttons.cancel.callback=a.onEscape=function(){return a.callback.call(this,null)},a.buttons.confirm.callback=function(){var c;switch(a.inputType){case"text":case"textarea":case"email":case"select":case"date":case"time":case"number":case"password":c=h.val();break;case"checkbox":var d=h.find("input:checked");c=[],g(d,function(a,d){c.push(b(d).val())})}return a.callback.call(this,c)},a.show=!1,!a.title)throw new Error("prompt requires a title");if(!b.isFunction(a.callback))throw new Error("prompt requires a callback");if(!n.inputs[a.inputType])throw new Error("invalid prompt type");switch(h=b(n.inputs[a.inputType]),a.inputType){case"text":case"textarea":case"email":case"date":case"time":case"number":case"password":h.val(a.value);break;case"select":var o={};if(k=a.inputOptions||[],!b.isArray(k))throw new Error("Please pass an array of input options");if(!k.length)throw new Error("prompt with select requires options");g(k,function(a,d){var e=h;if(d.value===c||d.text===c)throw new Error("given options in wrong format");d.group&&(o[d.group]||(o[d.group]=b("<optgroup/>").attr("label",d.group)),e=o[d.group]),e.append("<option value='"+d.value+"'>"+d.text+"</option>")}),g(o,function(a,b){h.append(b)}),h.val(a.value);break;case"checkbox":var q=b.isArray(a.value)?a.value:[a.value];if(k=a.inputOptions||[],!k.length)throw new Error("prompt with checkbox requires options");if(!k[0].value||!k[0].text)throw new Error("given options in wrong format");h=b("<div/>"),g(k,function(c,d){var e=b(n.inputs[a.inputType]);e.find("input").attr("value",d.value),e.find("label").append(d.text),g(q,function(a,b){b===d.value&&e.find("input").prop("checked",!0)}),h.append(e)})}return a.placeholder&&h.attr("placeholder",a.placeholder),a.pattern&&h.attr("pattern",a.pattern),a.maxlength&&h.attr("maxlength",a.maxlength),f.append(h),f.on("submit",function(a){a.preventDefault(),a.stopPropagation(),e.find(".btn-primary").click()}),e=p.dialog(a),e.off("shown.bs.modal"),e.on("shown.bs.modal",function(){h.focus()}),i===!0&&e.modal("show"),e},p.dialog=function(a){a=h(a);var d=b(n.dialog),f=d.find(".modal-dialog"),i=d.find(".modal-body"),j=a.buttons,k="",l={onEscape:a.onEscape};if(b.fn.modal===c)throw new Error("$.fn.modal is not defined; please double check you have included the Bootstrap JavaScript library. See http://getbootstrap.com/javascript/ for more details.");if(g(j,function(a,b){k+="<button data-bb-handler='"+a+"' type='button' class='btn "+b.className+"'>"+b.label+"</button>",l[a]=b.callback}),i.find(".bootbox-body").html(a.message),a.animate===!0&&d.addClass("fade"),a.className&&d.addClass(a.className),"large"===a.size?f.addClass("modal-lg"):"small"===a.size&&f.addClass("modal-sm"),a.title&&i.before(n.header),a.closeButton){var m=b(n.closeButton);a.title?d.find(".modal-header").prepend(m):m.css("margin-top","-10px").prependTo(i)}return a.title&&d.find(".modal-title").html(a.title),k.length&&(i.after(n.footer),d.find(".modal-footer").html(k)),d.on("hidden.bs.modal",function(a){a.target===this&&d.remove()}),d.on("shown.bs.modal",function(){d.find(".btn-primary:first").focus()}),"static"!==a.backdrop&&d.on("click.dismiss.bs.modal",function(a){d.children(".modal-backdrop").length&&(a.currentTarget=d.children(".modal-backdrop").get(0)),a.target===a.currentTarget&&d.trigger("escape.close.bb")}),d.on("escape.close.bb",function(a){l.onEscape&&e(a,d,l.onEscape)}),d.on("click",".modal-footer button",function(a){var c=b(this).data("bb-handler");e(a,d,l[c])}),d.on("click",".bootbox-close-button",function(a){e(a,d,l.onEscape)}),d.on("keyup",function(a){27===a.which&&d.trigger("escape.close.bb")}),b(a.container).append(d),d.modal({backdrop:a.backdrop?"static":!1,keyboard:!1,show:!1}),a.show&&d.modal("show"),d},p.setDefaults=function(){var a={};2===arguments.length?a[arguments[0]]=arguments[1]:a=arguments[0],b.extend(o,a)},p.hideAll=function(){return b(".bootbox").modal("hide"),p};var q={bg_BG:{OK:"Ок",CANCEL:"Отказ",CONFIRM:"Потвърждавам"},br:{OK:"OK",CANCEL:"Cancelar",CONFIRM:"Sim"},cs:{OK:"OK",CANCEL:"Zrušit",CONFIRM:"Potvrdit"},da:{OK:"OK",CANCEL:"Annuller",CONFIRM:"Accepter"},de:{OK:"OK",CANCEL:"Abbrechen",CONFIRM:"Akzeptieren"},el:{OK:"Εντάξει",CANCEL:"Ακύρωση",CONFIRM:"Επιβεβαίωση"},en:{OK:"OK",CANCEL:"Cancel",CONFIRM:"OK"},es:{OK:"OK",CANCEL:"Cancelar",CONFIRM:"Aceptar"},et:{OK:"OK",CANCEL:"Katkesta",CONFIRM:"OK"},fa:{OK:"قبول",CANCEL:"لغو",CONFIRM:"تایید"},fi:{OK:"OK",CANCEL:"Peruuta",CONFIRM:"OK"},fr:{OK:"OK",CANCEL:"Annuler",CONFIRM:"D'accord"},he:{OK:"אישור",CANCEL:"ביטול",CONFIRM:"אישור"},hu:{OK:"OK",CANCEL:"Mégsem",CONFIRM:"Megerősít"},hr:{OK:"OK",CANCEL:"Odustani",CONFIRM:"Potvrdi"},id:{OK:"OK",CANCEL:"Batal",CONFIRM:"OK"},it:{OK:"OK",CANCEL:"Annulla",CONFIRM:"Conferma"},ja:{OK:"OK",CANCEL:"キャンセル",CONFIRM:"確認"},lt:{OK:"Gerai",CANCEL:"Atšaukti",CONFIRM:"Patvirtinti"},lv:{OK:"Labi",CANCEL:"Atcelt",CONFIRM:"Apstiprināt"},nl:{OK:"OK",CANCEL:"Annuleren",CONFIRM:"Accepteren"},no:{OK:"OK",CANCEL:"Avbryt",CONFIRM:"OK"},pl:{OK:"OK",CANCEL:"Anuluj",CONFIRM:"Potwierdź"},pt:{OK:"OK",CANCEL:"Cancelar",CONFIRM:"Confirmar"},ru:{OK:"OK",CANCEL:"Отмена",CONFIRM:"Применить"},sq:{OK:"OK",CANCEL:"Anulo",CONFIRM:"Prano"},sv:{OK:"OK",CANCEL:"Avbryt",CONFIRM:"OK"},th:{OK:"ตกลง",CANCEL:"ยกเลิก",CONFIRM:"ยืนยัน"},tr:{OK:"Tamam",CANCEL:"İptal",CONFIRM:"Onayla"},zh_CN:{OK:"OK",CANCEL:"取消",CONFIRM:"确认"},zh_TW:{OK:"OK",CANCEL:"取消",CONFIRM:"確認"}};return p.addLocale=function(a,c){return b.each(["OK","CANCEL","CONFIRM"],function(a,b){if(!c[b])throw new Error("Please supply a translation for '"+b+"'")}),q[a]={OK:c.OK,CANCEL:c.CANCEL,CONFIRM:c.CONFIRM},p},p.removeLocale=function(a){return delete q[a],p},p.setLocale=function(a){return p.setDefaults("locale",a)},p.init=function(c){return a(c||b)},p});
+/*
+ * angular-auto-validate - v1.19.6 - 2016-06-17
+ * https://github.com/jonsamwell/angular-auto-validate
+ * Copyright (c) 2016 Jon Samwell (http://www.jonsamwell.com)
+ */
+!function(a,b){"use strict";function c(){var a={},c=!0,d=!0,e=!1,f=!0,g=!0,h=function(a){var b;return a&&0!==a.length?(b=a.toLowerCase(),a=!("f"===b||"0"===b||"false"===b)):a=!1,a},i=function(a,b){var c;return void 0!==a&&(c=a.attr(b)||a.attr("data-"+b)),c},j=function(a,b){var c;return void 0!==a&&(c=void 0!==a.attr(b)||void 0!==a.attr("data-"+b)),c},k=function(a,b){return h(i(a,b))},l=function(a){return c&&!k(a,"disable-valid-styling")},m=function(a){return!k(a,"disable-auto-validate")},n=function(a){return d&&!k(a,"disable-invalid-styling")};this.enable=function(a){f=a},this.isEnabled=function(){return f},this.setDefaultElementModifier=function(b){if(void 0===a[b])throw new Error("Element modifier not registered: "+b);this.defaultElementModifier=b},this.registerDomModifier=function(b,c){a[b]=c},this.setErrorMessageResolver=function(a){this.errorMessageResolver=a},this.getErrorMessage=function(a,c){var d;if(void 0===this.errorMessageResolver)throw new Error("Please set an error message resolver via the setErrorMessageResolver function before attempting to resolve an error message.");return j(c,"disable-validation-message")?(d=b.injector(["ng"]).get("$q").defer(),d.resolve(""),d.promise):this.errorMessageResolver(a,c)},this.setValidElementStyling=function(a){c=a},this.setInvalidElementStyling=function(a){d=a},this.setFirstInvalidElementScrollingOnSubmit=function(a){e=a},this.firstInvalidElementScrollingOnSubmitEnabled=function(){return e},this.setFocusInputError=function(a){g=a},this.enableFocusInputError=function(){return g},this.getDomModifier=function(b){var c=(void 0!==b?b.attr("element-modifier"):this.defaultElementModifier)||(void 0!==b?b.attr("data-element-modifier"):this.defaultElementModifier)||this.defaultElementModifier;if(void 0===c)throw new Error("Please set a default dom modifier via the setDefaultElementModifier method on the validator class.");return a[c]},this.makeValid=function(a){m(a)&&(l(a)?this.getDomModifier(a).makeValid(a):this.makeDefault(a))},this.makeInvalid=function(a,b){m(a)&&(n(a)?this.getDomModifier(a).makeInvalid(a,b):this.makeDefault(a))},this.makeDefault=function(a){if(m(a)){var b=this.getDomModifier(a);b.makeDefault&&b.makeDefault(a)}},this.waitForAsyncValidators=function(a){if(m(a)){var b=this.getDomModifier(a);b.waitForAsyncValidators&&b.waitForAsyncValidators(a)}},this.defaultFormValidationOptions={forceValidation:!1,disabled:!1,validateNonVisibleControls:!1,removeExternalValidationErrorsOnSubmit:!0,validateOnFormSubmit:!1,waitForAsyncValidators:!0},this.$get=[function(){return this}]}function d(a){var c=!1,d=["<style>.glyphicon-spin-jcs {-webkit-animation: spin 1000ms infinite linear;animation: spin 1000ms infinite linear;}@-webkit-keyframes spin {0% {-webkit-transform: rotate(0deg);transform: rotate(0deg);}100% {-webkit-transform: rotate(359deg);transform: rotate(359deg);}}@keyframes spin {0% {-webkit-transform: rotate(0deg);transform: rotate(0deg);}100% {-webkit-transform: rotate(359deg);transform: rotate(359deg);}}</style>"].join(""),e=function(a){c===!1&&(b.element(document.body).append(b.element(d)),c=!0),b.forEach(a.find("span"),function(a){a=b.element(a),(a.hasClass("error-msg")||a.hasClass("form-control-feedback")||a.hasClass("control-feedback"))&&a.remove()}),a.removeClass("has-success has-error has-feedback")},f=function(a,b){for(var c,d=a,e=0;10>=e;e+=1){if(void 0!==d&&d.hasClass(b)){c=d;break}void 0!==d&&(d=d.parent())}return c},g=function(a,c){for(var d,e=0;e<a.children.length&&(d=a.children[e],void 0===d||!b.element(d).hasClass(c))&&!(void 0!==d.children&&(d=g(d,c),d.length>0));e+=1);return b.element(d)},h=function(a){return f(a,"form-group")},i=function(a){return g(a,"input-group")},j=function(a,b){a[0].parentNode.insertBefore(b[0],a[0].nextSibling)},k=!1,l=function(a){k=a},m=function(c){var d,f=h(c);if(f){if(e(f),d=i(f[0]),f.addClass("has-success "+(d.length>0||k===!1?"":"has-feedback")),k){var g='<span class="glyphicon glyphicon-ok form-control-feedback"></span>';d.length>0&&(g=g.replace("form-",""),g='<span class="input-group-addon control-feedback">'+g+"</span>"),j(c,b.element(g))}}else a.error("Angular-auto-validate: invalid bs3 form structure elements must be wrapped by a form-group class")},n=function(c,d){var f,g=h(c),l=b.element('<span class="help-block has-error error-msg">'+d+"</span>");if(g){if(e(g),f=i(g[0]),g.addClass("has-error "+(f.length>0||k===!1?"":"has-feedback")),j(f.length>0?f:o(c),l),k){var m='<span class="glyphicon glyphicon-remove form-control-feedback"></span>';f.length>0&&(m=m.replace("form-",""),m='<span class="input-group-addon control-feedback">'+m+"</span>"),j(o(c),b.element(m))}}else a.error("Angular-auto-validate: invalid bs3 form structure elements must be wrapped by a form-group class")},o=function(a){var b=a,c=a[0].type?a[0].type.toLowerCase():"";return"checkbox"!==c&&"radio"!==c||"label"!==a.parent()[0].nodeName.toLowerCase()||(b=a.parent()),b},p=function(b){var c=h(b);c?e(c):a.error("Angular-auto-validate: invalid bs3 form structure elements must be wrapped by a form-group class")},q=function(c){var d,f=h(c);if(f){if(e(f),d=i(f[0]),f.addClass("has-feedback "+(d.length>0||k===!1?"":"has-feedback")),k){var g='<span class="glyphicon glyphicon-repeat glyphicon-spin-jcs form-control-feedback"></span>';d.length>0&&(g=g.replace("form-",""),g='<span class="input-group-addon control-feedback">'+g+"</span>"),j(c,b.element(g))}}else a.error("Angular-auto-validate: invalid bs3 form structure elements must be wrapped by a form-group class")};return{makeValid:m,makeInvalid:n,makeDefault:p,waitForAsyncValidators:q,enableValidationStateIcons:l,key:"bs3"}}function e(a){var b=function(b,c,d){var e;return function(){var f=this,g=arguments,h=function(){e=null,d||b.apply(f,g)},i=d&&!e;a.cancel(e),e=a(h,c,!1),i&&b.apply(f,g)}};return{debounce:b}}function f(a,b){return a.replace(/{(\d+)}/g,function(a,c){return void 0!==typeof b[c]?b[c]:a})}function g(a,c){var d,e="default",g="js/angular-auto-validate/dist/lang",h=function(a){return d=c.get(f("{0}/jcs-auto-validate_{1}.json",[g,a.toLowerCase()]))},i=function(a){g=a},j=function(c,f){var g=a.defer();return f=f||h,e=c.toLowerCase(),void 0===b.autoValidate.errorMessages[e]?(d=f(c),d.then(function(a){d=void 0,b.autoValidate.errorMessages[e]=a.data,g.resolve(b.autoValidate.errorMessages[e])},function(a){b.autoValidate.errorMessages[e]={defaultMsg:"Loading culture failed!"},d=null,g.reject(a)})):g.resolve(b.autoValidate.errorMessages[e]),g.promise},k=function(c){var f=a.defer();return c=void 0===c?e:c.toLowerCase(),void 0!==d?d.then(function(){f.resolve(b.autoValidate.errorMessages[c])},function(a){f.reject(a)}):f.resolve(b.autoValidate.errorMessages[c]),f.promise},l=function(a,b){var c;return b&&(a+="-err-type",c=b.attr("ng-"+a),void 0===c&&(c=b.attr("data-ng-"+a)||b.attr(a)),c&&(c=c.replace(/[\W]/g,""))),c},m=function(c,g){var h,i,j,k=a.defer(),n=[];if(void 0!==d)d.then(function(){m(c,g).then(function(a){k.resolve(a)})});else{if(h=b.autoValidate.errorMessages[e][c],j=l(c,g),j&&(h=b.autoValidate.errorMessages[e][j]),void 0===h&&void 0!==j?h=f(b.autoValidate.errorMessages[e].defaultMsg,[j]):void 0===h&&(h=f(b.autoValidate.errorMessages[e].defaultMsg,[c])),g&&g.attr)try{i=g.attr("ng-"+c),void 0===i&&(i=g.attr("data-ng-"+c)||g.attr(c)),n.push(i||""),h=f(h,n)}catch(o){}k.resolve(h)}return k.promise};return{setI18nFileRootPath:i,setCulture:j,getErrorMessages:k,resolve:m}}function h(){var a=function(a,c){b.forEach(a.find("small"),function(a){b.element(a).hasClass("error")&&b.element(a).remove()}),c.removeClass("error")},c=function(a){for(var b=a,c=0;3>=c&&(void 0===b||!b.hasClass("columns")&&!b.hasClass("column"));c+=1)void 0!==b&&(b=b.parent());return b},d=function(b){var d=c(b);a(d&&d.length>0?d:b,b)},e=function(d,e){var f,g=c(d);a(g||d,d),d.addClass("error"),g&&(f=b.element('<small class="error">'+e+"</small>"),g.append(f))},f=function(a){d(a)};return{makeValid:d,makeInvalid:e,makeDefault:f,key:"foundation5"}}function i(){var a=function(a,c){b.forEach(a.find("small"),function(a){b.element(a).hasClass("form-error is-visible")&&b.element(a).remove()}),c.removeClass("alert callout")},c=function(a){for(var b=a,c=0;3>=c&&(void 0===b||!b.hasClass("columns")&&!b.hasClass("column"));c+=1)void 0!==b&&(b=b.parent());return b},d=function(b){var d=c(b);a(d&&d.length>0?d:b,b)},e=function(d,e){var f,g=c(d);a(g||d,d),d.addClass("alert callout"),g&&(f=b.element('<small class="form-error is-visible">'+e+"</small>"),g.append(f))},f=function(a){d(a)};return{makeValid:d,makeInvalid:e,makeDefault:f,key:"foundation6"}}function j(){var a=function(a){return a[0].offsetWidth>0&&a[0].offsetHeight>0};return{isElementVisible:a}}function k(a,c,d){var e=["input","textarea","select","form"],f=function(a){return c.isElementVisible(a)},g=function(c){var d,e=b.element(c).controller("form");return d=void 0!==e&&null!==e?e.autoValidateFormOptions:a.defaultFormValidationOptions},h=function(a,b,c){var d,g,h,i=a&&a.length>0,j=i&&"#comment"===a[0].nodeName.toLowerCase();return i&&j===!1&&(d=f(a)||b.validateNonVisibleControls,g=e.indexOf(a[0].nodeName.toLowerCase())>-1||a[0].hasAttribute("register-custom-form-control"),h=b.validateOnFormSubmit===!1||b.validateOnFormSubmit===!0&&c===!0),i&&!j&&d&&g&&h},i=function(c,d,e){var f,i=!0,j=e||g(d),k=c.$pristine===!1||j.forceValidation,l=function(a){var c,d=!0;return b.forEach(a,function(a,b){d&&a&&(d=!1,c=b)}),c};return j.disabled===!1&&(j.forceValidation||h(d,j,j.getFormController().$submitted)&&c&&k)&&(i=!c.$invalid,j.removeExternalValidationErrorsOnSubmit&&c.removeAllExternalValidation&&c.removeAllExternalValidation(),void 0!==c.$pending&&e.waitForAsyncValidators===!0?a.waitForAsyncValidators(d):i?a.makeValid(d):(f=l(c.$errors||c.$error),void 0===f?i=!0:a.getErrorMessage(f,d).then(function(b){a.makeInvalid(d,b)}))),i},j=function(b){a.makeDefault(b)},k=function(a){b.forEach(a[0].all||a[0].elements||a[0],function(a){var c,d=b.element(a);c=d.controller("ngModel"),void 0!==c&&("form"===d[0].nodeName.toLowerCase()?k(d):c.$setPristine())})},l=function(c){var e,f=!0,j=null,k=c?b.element(c).controller("form"):void 0,m=function(c,e,m){var n,o,p,q;if(c=b.element(c),n=c.controller("ngModel"),void 0!==n&&(e||h(c,m,k.$submitted)))if("form"===c[0].nodeName.toLowerCase())l(c);else{p=g(c),q=p.forceValidation,p.forceValidation=e;try{if(o=i(n,c,p),a.enableFocusInputError()&&!o&&f&&(j||(j=c[0],j.focus())),a.firstInvalidElementScrollingOnSubmitEnabled()&&!o&&f){var r=c.attr("id");r&&d(r)}f=f&&o}finally{p.forceValidation=q}}};return void 0===c||void 0!==k&&k.autoValidateFormOptions.disabled?void 0!==c:(e=b.copy(k.autoValidateFormOptions),e.forceValidation=!0,b.forEach(c[0].elements||c[0].all||c[0],function(a){m(a,!0,e)}),c[0].customHTMLFormControlsCollection&&b.forEach(c[0].customHTMLFormControlsCollection,function(a){m(a,!0,e)}),f)},m=function(b,c,d){d?a.makeInvalid(b,d):a.getErrorMessage(c,b).then(function(c){a.makeInvalid(b,c)})};return{setElementValidationError:m,validateElement:i,validateForm:l,resetElement:j,resetForm:k}}function l(a,b){return void 0!==a&&null!==a||void 0===b?"false"!==a:b}function m(a,c,d){var e=a.autoValidateFormOptions=a.autoValidateFormOptions||b.copy(c.defaultFormValidationOptions);e.getFormController=function(){return a},e.waitForAsyncValidators=l(d.waitForAsyncValidators,e.waitForAsyncValidators),e.forceValidation=!1,e.disabled=!c.isEnabled()||l(d.disableDynamicValidation,e.disabled),e.validateNonVisibleControls=l(d.validateNonVisibleControls,e.validateNonVisibleControls),e.validateOnFormSubmit=l(d.validateOnFormSubmit,e.validateOnFormSubmit),e.removeExternalValidationErrorsOnSubmit=void 0===d.removeExternalValidationErrorsOnSubmit?e.removeExternalValidationErrorsOnSubmit:l(d.removeExternalValidationErrorsOnSubmit,e.removeExternalValidationErrorsOnSubmit),c.isEnabled()===!1&&"false"===d.disableDynamicValidation&&(e.disabled=!1)}function n(a){return{restrict:"E",link:function(b,c){function d(){a.resetForm(c),e.$setPristine&&e.$setPristine(),e.$setUntouched&&e.$setUntouched()}var e=c.controller("form");void 0!==e&&e.autoValidateFormOptions&&e.autoValidateFormOptions.disabled===!1&&(c.on("reset",d),b.$on("$destroy",function(){c.off("reset",d)}))}}}function o(){var a=function(a){for(var c=a,d=0;50>=d&&(void 0===c||"form"!==c.nodeName.toLowerCase());d+=1)void 0!==c&&(c=b.element(c).parent()[0]);return c};return{restrict:"A",link:function(b,c){var d=a(c.parent()[0]);d&&(d.customHTMLFormControlsCollection=d.customHTMLFormControlsCollection||[],d.customHTMLFormControlsCollection.push(c[0]))}}}function p(a,b,c){return a[0].compile=function(a,d){var e=b(d.ngSubmit),f="true"===d.ngSubmitForce;return function(a,b){function d(d){a.$apply(function(){void 0!==i&&null!==i&&i.autoValidateFormOptions&&i.autoValidateFormOptions.disabled===!0?e(a,{$event:d}):(void 0===i.$setSubmitted&&(i.$submitted=!0),(c.validateForm(b)||f===!0)&&e(a,{$event:d}))})}function g(){b[0].reset?b[0].reset():c.resetForm(b)}var h,i=b.controller("form");i&&i.autoValidateFormOptions&&(i.autoValidateFormOptions.resetForm=g,void 0!==i.$name&&""!==i.$name&&(h=a.$on("form:"+i.$name+":reset",g))),b.on("submit",d),a.$on("$destroy",function(){b.off("submit",d),h&&h()})}},a}function q(a){a.decorator("ngSubmitDirective",p)}function r(a,b,c,d,e){a.setErrorMessageResolver(b.resolve),a.registerDomModifier(c.key,c),a.registerDomModifier(d.key,d),a.registerDomModifier(e.key,e),a.setDefaultElementModifier(c.key)}b.module("jcs-autoValidate",[]),b.module("jcs-autoValidate").provider("validator",c),d.$inject=["$log"],b.module("jcs-autoValidate").factory("bootstrap3ElementModifier",d),e.$inject=["$timeout"],b.module("jcs-autoValidate").factory("jcs-debounce",e),b.autoValidate=b.autoValidate||{errorMessages:{}},b.autoValidate.errorMessages["default"]={defaultMsg:"Please add error message for {0}",email:"Please enter a valid email address",minlength:"Please enter at least {0} characters",maxlength:"You have entered more than the maximum {0} characters",min:"Please enter the minimum number of {0}",max:"Please enter the maximum number of {0}",required:"This field is required",date:"Please enter a valid date",pattern:"Please ensure the entered information adheres to this pattern {0}",number:"Please enter a valid number",url:"Please enter a valid URL in the format of http(s)://www.google.com"},g.$inject=["$q","$http"],b.module("jcs-autoValidate").factory("defaultErrorMessageResolver",g),b.module("jcs-autoValidate").factory("foundation5ElementModifier",h),b.module("jcs-autoValidate").factory("foundation6ElementModifier",i),k.$inject=["validator","jcs-elementUtils","$anchorScroll"],b.module("jcs-autoValidate").factory("jcs-elementUtils",j),b.module("jcs-autoValidate").factory("validationManager",k),b.module("jcs-autoValidate").directive("form",["validator",function(a){return{restrict:"E",require:"form",compile:function(){return{pre:function(b,c,d,e){m(e,a,d)}}}}}]),b.module("jcs-autoValidate").directive("ngForm",["validator",function(a){return{restrict:"EA",require:"form",priority:9999,compile:function(){return{pre:function(b,c,d,e){m(e,a,d)}}}}}]),n.$inject=["validationManager"],b.module("jcs-autoValidate").directive("form",n),b.module("jcs-autoValidate").directive("registerCustomFormControl",o),p.$inject=["$delegate","$parse","validationManager"],q.$inject=["$provide"],b.module("jcs-autoValidate").config(q),b.module("jcs-autoValidate").config(["$provide",function(a){a.decorator("ngModelDirective",["$timeout","$delegate","validationManager","jcs-debounce",function(a,c,d,e){var f=c[0],g=f.link||f.compile;return f.compile=function(a){var c=b.version.major>=1&&b.version.minor>=3,f=g;return c&&b.isFunction(g)&&(f=g(a)),{pre:function(a,g,h,i){var j=i[0],k=i[1],l=void 0===h.ngModelOptions?void 0:a.$eval(h.ngModelOptions),m=j.$setValidity,n=j.$setPristine,o=e.debounce(function(){var a=void 0!==k&&null!==k?k.autoValidateFormOptions:void 0;d.validateElement(j,g,a)},100);return void 0===h.formnovalidate&&void 0!==k&&null!==k&&k.autoValidateFormOptions&&k.autoValidateFormOptions.disabled===!1&&(c||!c||void 0===l||void 0===l.updateOn||""===l.updateOn?j.$setValidity=function(a,b){m.call(j,a,b),o()}:(g.on(l.updateOn,function(){o()}),a.$on("$destroy",function(){g.off(l.updateOn)})),j.$setPristine=function(){n.call(j),d.resetElement(g)},j.autoValidated=!0),j.setExternalValidation=function(a,b,c){c&&j.$setValidity(a,!1),j.externalErrors=j.externalErrors||{},j.externalErrors[a]=!1,d.setElementValidationError(g,a,b)},j.removeExternalValidation=function(a,b){if(b){j.$setValidity(a,!0);var c=j.$error||j.$errors;delete c[a]}j.externalErrors&&delete j.externalErrors[a],d.resetElement(g)},j.removeAllExternalValidation=function(){if(j.externalErrors){var a=j.$error||j.$errors;b.forEach(j.externalErrors,function(b,c){j.$setValidity(c,!0),delete a[c]}),j.externalErrors={},d.resetElement(g)}},k&&(k.setExternalValidation=function(a,b,c,d){var e=!1;return k[a]&&(k[a].setExternalValidation(b,c,d),e=!0),e},k.removeExternalValidation=function(a,b,c,d){var e=!1;return k[a]&&(k[a].removeExternalValidation(b,d),e=!0),e}),f.pre?f.pre.apply(this,arguments):this},post:function(a,b,c,d){return f.post?f.post.apply(this,arguments):f.apply(this,arguments)}}},c}])}]),r.$inject=["validator","defaultErrorMessageResolver","bootstrap3ElementModifier","foundation5ElementModifier","foundation6ElementModifier"],b.module("jcs-autoValidate").run(r)}(String,angular);
 (function(){
     'use strict';
     
@@ -370,6 +376,7 @@ c=c.replace(q,function(a){p=a;return""});e=e||{};t(m.urlParams,function(a,b){h=e
         'ngResource',
         'ui.router',
         'satellizer',
+        'jcs-autoValidate',
     ]);
             
 })();
@@ -399,9 +406,11 @@ c=c.replace(q,function(a){p=a;return""});e=e||{};t(m.urlParams,function(a,b){h=e
 
     }
 
-    run.$inject = ['$rootScope', '$state', '$auth'];
+    run.$inject = ['$rootScope', '$state', '$auth','bootstrap3ElementModifier'];
     /* @ngInject */
-    function run($rootScope, $state, $auth) {
+    function run($rootScope, $state, $auth, bootstrap3ElementModifier) {
+        bootstrap3ElementModifier.enableValidationStateIcons(true);
+        
         // $stateChangeStart is fired whenever the state changes. We can use some parameters
         // such as toState to hook into details about the state as it is changing
         $rootScope.$on('$stateChangeStart', function (event, toState) {
@@ -538,6 +547,22 @@ c=c.replace(q,function(a){p=a;return""});e=e||{};t(m.urlParams,function(a,b){h=e
                 }
             }
         };
+        
+        var postEdit = {
+            name: "post.edit",
+            url: "/edit/:id",
+            parent: post,
+            views: {
+                "page_body": {
+                    templateUrl: "./admin/app/post/post.add.html",
+                    controller: "PostEditController",
+                    controllerAs: "vm",
+                    resolve: {
+                        auth: doAuth
+                    }
+                }
+            }
+        };
 
         var category = {
             name: "category",
@@ -580,6 +605,7 @@ c=c.replace(q,function(a){p=a;return""});e=e||{};t(m.urlParams,function(a,b){h=e
                 .state(dashboard)
                 .state(post)
                 .state(postAdd)
+                .state(postEdit)
                 .state(category)
                 .state(tag);
         
@@ -649,7 +675,8 @@ c=c.replace(q,function(a){p=a;return""});e=e||{};t(m.urlParams,function(a,b){h=e
             getCurrentState: getCurrentState,
             getPrevState: getPrevState,
             removeFromList: removeFromList,
-            addToList: addToList
+            addToList: addToList,
+            refreshList: refreshList,
         }
         
         return service;
@@ -670,20 +697,30 @@ c=c.replace(q,function(a){p=a;return""});e=e||{};t(m.urlParams,function(a,b){h=e
             return false;
         }
         
-        function removeFromList(attr, id){
-            for(var x = 0; x < attr.length; x++){
-                if(attr[x].id == id){
-                    attr.splice(x,1);
+        function removeFromList(list, id){
+            for(var x = 0; x < list.length; x++){
+                if(list[x].id == id){
+                    list.splice(x,1);
                 }
             }
             
-            return attr;
+            return list;
         }
         
-        function addToList(attr, newData){
-            attr.push(newData);
+        function addToList(list, newData){
+            list.push(newData);
             
-            return attr;
+            return list;
+        }
+        
+        function refreshList(list, data){
+            list.splice(0,list.length);
+            
+            for(var x = 0; x < data.length; x++){
+                list.push(data[x]);
+            }
+            
+            return list;
         }
     }
     
@@ -962,6 +999,52 @@ c=c.replace(q,function(a){p=a;return""});e=e||{};t(m.urlParams,function(a,b){h=e
     'use strict';
     
     angular.module('app')
+            .controller('PostAddController', PostAddController);
+    
+    PostAddController.$inject = ['PostService','HelperService'];
+    
+    /* @ngInject */
+    function PostAddController(PostService, HelperService){
+        var vm = this;
+        
+        vm.mode = "Add";
+        vm.title = "";
+        vm.content = "";
+        vm.response = {};
+        vm.isDone = false;
+        
+        vm.prevState = HelperService.getPrevState();
+        vm.submitAction = addPost;
+        
+        ///////////////////
+        
+        function addPost(){
+            var data = setData();
+            PostService.addPost(data).then(function(){
+                vm.response['success'] = "alert-success";
+                vm.response['alert'] = "Success!";
+                vm.response['msg'] = "Added new post.";
+                vm.isDone = true;
+            }).catch(function(){
+                vm.response['success'] = "alert-danger";
+                vm.response['alert'] = "Error!";
+                vm.response['msg'] = "Failed to add new post.";
+                vm.isDone = true;
+            });
+        }
+        
+        function setData(){
+            return {
+                title: vm.title,
+                content: vm.content
+            };
+        }
+    }
+})();
+(function(){
+    'use strict';
+    
+    angular.module('app')
             .controller('PostController', PostController);
     
     PostController.$inject = ['postPrepService'];
@@ -969,9 +1052,8 @@ c=c.replace(q,function(a){p=a;return""});e=e||{};t(m.urlParams,function(a,b){h=e
     /* @ngInject */
     function PostController(postPrepService){
         var vm = this;
+        
         vm.posts = postPrepService.posts;
-        console.log(postPrepService);
-        console.log(vm.posts);
         vm.error = postPrepService.errors;
         vm.hasDeleted = false;
         vm.response = {};
@@ -983,7 +1065,7 @@ c=c.replace(q,function(a){p=a;return""});e=e||{};t(m.urlParams,function(a,b){h=e
         function deletePost(post) {
             bootbox.confirm({
                 title: "Confirm Delete",
-                message: "Are you sure you want to delete post: " + post.title + "?",
+                message: "Are you sure you want to delete post: <b>" + post.title + "</b>?",
                 buttons: {
                     confirm: {
                         label: 'Yes',
@@ -1006,11 +1088,12 @@ c=c.replace(q,function(a){p=a;return""});e=e||{};t(m.urlParams,function(a,b){h=e
         function doDelete(id){
             postPrepService.deletePost(id).then(function (resp) {
                 vm.hasDeleted = true;
+                
                 vm.response['success'] = "alert-success";
                 vm.response['alert'] = "Success!";
                 vm.response['msg'] = resp.data.message;
                 vm.posts = postPrepService.posts;
-                console.log(vm.posts);
+                
                 vm.hasAdded = true;
             }).catch(function () {
                 vm.response['success'] = "alert-danger";
@@ -1018,6 +1101,55 @@ c=c.replace(q,function(a){p=a;return""});e=e||{};t(m.urlParams,function(a,b){h=e
                 vm.response['msg'] = "Failed to delete post.";
                 vm.hasAdded = true;
             });
+        }
+    }
+})();
+(function(){
+    'use strict';
+    
+    angular.module('app')
+            .controller('PostEditController', PostEditController);
+    
+    PostEditController.$inject = ['PostService','HelperService','$stateParams'];
+    
+    /* @ngInject */
+    function PostEditController(PostService, HelperService, $stateParams){
+        var vm = this;
+        
+        vm.mode = "Edit";
+        vm.postId = $stateParams.id;
+        vm.selectedPost = PostService.getPost(vm.postId);
+        vm.title = vm.selectedPost.title;
+        vm.content = vm.selectedPost.content;
+        vm.response = {};
+        vm.isDone = false;
+        
+        vm.prevState = HelperService.getPrevState();
+        vm.submitAction = editPost;
+        
+        ///////////////////
+        
+        function editPost(){
+            var data = setData();
+            PostService.editPost(data).then(function(){
+                vm.response['success'] = "alert-success";
+                vm.response['alert'] = "Success!";
+                vm.response['msg'] = "Updated post.";
+                vm.isDone = true;
+            }).catch(function(){
+                vm.response['success'] = "alert-danger";
+                vm.response['alert'] = "Error!";
+                vm.response['msg'] = "Failed to update post.";
+                vm.isDone = true;
+            });
+        }
+        
+        function setData(){
+            return {
+                id: vm.postId,
+                title: vm.title,
+                content: vm.content
+            };
         }
     }
 })();
@@ -1037,9 +1169,11 @@ c=c.replace(q,function(a){p=a;return""});e=e||{};t(m.urlParams,function(a,b){h=e
             posts: [],
             errors: [],
             addPost: addPost,
+            editPost: editPost,
             deletePost: deletePost,
             getPosts: getPosts,
-            activate: activate
+            activate: activate,
+            getPost: getPost
         }
 
         service.activate();
@@ -1052,45 +1186,10 @@ c=c.replace(q,function(a){p=a;return""});e=e||{};t(m.urlParams,function(a,b){h=e
             return service.getPosts();
         }
         
-        function addPost(data) {
-            var addUrl = api + "add/";
-            var d = $q.defer();
-
-            $http.post(addUrl, data)
-                    .then(function (resp) {
-                        console.log(resp);
-                        var newPosts = HelperService.addToList(service.posts, resp.data.new_post);
-                        service.posts = newPosts;
-                        d.resolve(resp);
-                    }).catch(function(error){
-                        console.log(error.data);
-                        service.errors = error;
-                        d.reject(error);
-                    });
-
-            return d.promise;
-        }
-        
-        function deletePost(id){
-            var deletUrl = api + "delete/" + id;
-            var d = $q.defer();
-            
-            $http.post(deletUrl, {})
-                    .then(function (resp) {
-                        var newPosts = HelperService.removeFromList(service.posts, id);
-                        service.posts = newPosts;
-                        d.resolve(resp);
-                    }).catch(function(error){
-                        console.log(error.data);
-                        service.errors = error;
-                        d.reject(error);
-                    });
-
-            return d.promise;
-        }
-
         function getPosts() {
             var d = $q.defer();
+            
+            service.posts = [];
             
             $http.get(api)
                     .then(function (data) {
@@ -1105,53 +1204,71 @@ c=c.replace(q,function(a){p=a;return""});e=e||{};t(m.urlParams,function(a,b){h=e
 
             return d.promise;
         }
+        
+        function getPost(id) {
+            var selId = parseInt(id);
+            for (var i = 0; i < service.posts.length; i++) {
+                var obj = service.posts[i];
+                if (obj.id == selId) {
+                    return obj;
+                }
+
+            }
+        }
+        
+        function addPost(data) {
+            var url = api + "add/";
+            var d = $q.defer();
+
+            $http.post(url, data)
+                    .then(function (resp) {
+                        HelperService.refreshList(service.posts, resp.data.data);
+                        d.resolve(resp);
+                    }).catch(function(error){
+                        console.log(error.data);
+                        service.errors = error;
+                        d.reject(error);
+                    });
+
+            return d.promise;
+        }
+        
+        function editPost(data) {
+            var url = api + "edit/";
+            var d = $q.defer();
+
+            $http.post(url, data)
+                    .then(function (resp) {
+                        HelperService.refreshList(service.posts, resp.data.data);
+                        d.resolve(resp);
+                    }).catch(function(error){
+                        console.log(error.data);
+                        service.errors = error;
+                        d.reject(error);
+                    });
+
+            return d.promise;
+        }
+        
+        function deletePost(id){
+            var url = api + "delete/" + id;
+            var d = $q.defer();
+            
+            $http.post(url, {})
+                    .then(function (resp) {
+                        var newPosts = HelperService.removeFromList(service.posts, id);
+                        service.posts = newPosts;
+                        d.resolve(resp);
+                    }).catch(function(error){
+                        console.log(error.data);
+                        service.errors = error;
+                        d.reject(error);
+                    });
+
+            return d.promise;
+        }
     }
 
-})();
-(function(){
-    'use strict';
-    
-    angular.module('app')
-            .controller('PostAddController', PostAddController);
-    
-    PostAddController.$inject = ['PostService','HelperService'];
-    
-    /* @ngInject */
-    function PostAddController(PostService, HelperService){
-        var vm = this;
-        
-        vm.title = "";
-        vm.content = "";
-        vm.response = {};
-        vm.hasAdded = false;
-        
-        vm.prevState = HelperService.getPrevState();
-        vm.addPost = addPost;
-        
-        ///////////////////
-        
-        function addPost(){
-            var data = setData();
-            PostService.addPost(data).then(function(){
-                vm.response['success'] = "alert-success";
-                vm.response['alert'] = "Success!";
-                vm.response['msg'] = "Added new post.";
-                vm.hasAdded = true;
-            }).catch(function(){
-                vm.response['success'] = "alert-danger";
-                vm.response['alert'] = "Error!";
-                vm.response['msg'] = "Failed to add new post.";
-                vm.hasAdded = true;
-            });
-        }
-        
-        function setData(){
-            return {
-                title: vm.title,
-                content: vm.content
-            };
-        }
-    }
 })();
 (function(){
     'use strict';

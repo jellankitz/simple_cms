@@ -15,9 +15,11 @@
 
     }
 
-    run.$inject = ['$rootScope', '$state', '$auth'];
+    run.$inject = ['$rootScope', '$state', '$auth','bootstrap3ElementModifier'];
     /* @ngInject */
-    function run($rootScope, $state, $auth) {
+    function run($rootScope, $state, $auth, bootstrap3ElementModifier) {
+        bootstrap3ElementModifier.enableValidationStateIcons(true);
+        
         // $stateChangeStart is fired whenever the state changes. We can use some parameters
         // such as toState to hook into details about the state as it is changing
         $rootScope.$on('$stateChangeStart', function (event, toState) {

@@ -12,7 +12,8 @@
             getCurrentState: getCurrentState,
             getPrevState: getPrevState,
             removeFromList: removeFromList,
-            addToList: addToList
+            addToList: addToList,
+            refreshList: refreshList,
         }
         
         return service;
@@ -33,20 +34,30 @@
             return false;
         }
         
-        function removeFromList(attr, id){
-            for(var x = 0; x < attr.length; x++){
-                if(attr[x].id == id){
-                    attr.splice(x,1);
+        function removeFromList(list, id){
+            for(var x = 0; x < list.length; x++){
+                if(list[x].id == id){
+                    list.splice(x,1);
                 }
             }
             
-            return attr;
+            return list;
         }
         
-        function addToList(attr, newData){
-            attr.push(newData);
+        function addToList(list, newData){
+            list.push(newData);
             
-            return attr;
+            return list;
+        }
+        
+        function refreshList(list, data){
+            list.splice(0,list.length);
+            
+            for(var x = 0; x < data.length; x++){
+                list.push(data[x]);
+            }
+            
+            return list;
         }
     }
     

@@ -85,6 +85,22 @@
                 }
             }
         };
+        
+        var postEdit = {
+            name: "post.edit",
+            url: "/edit/:id",
+            parent: post,
+            views: {
+                "page_body": {
+                    templateUrl: "./admin/app/post/post.add.html",
+                    controller: "PostEditController",
+                    controllerAs: "vm",
+                    resolve: {
+                        auth: doAuth
+                    }
+                }
+            }
+        };
 
         var category = {
             name: "category",
@@ -127,6 +143,7 @@
                 .state(dashboard)
                 .state(post)
                 .state(postAdd)
+                .state(postEdit)
                 .state(category)
                 .state(tag);
         

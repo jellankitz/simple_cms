@@ -14,22 +14,22 @@ use Illuminate\Http\Request;
  */
 
 Route::group(['prefix' => 'authenticate'], function () {
-    Route::post('/', 'AuthenticateController@authenticate');
-    Route::get('/user', 'AuthenticateController@getAuthenticatedUser');
+    Route::post('/', 'Auth\AuthenticateController@authenticate');
+    Route::get('/user', 'Auth\AuthenticateController@getAuthenticatedUser');
 });
 
 Route::group(['prefix' => 'nav'], function () {
-    Route::get('/', 'NavigationController@index');
+    Route::get('/', 'Api\NavigationController@index');
 });
 
 Route::group(['prefix' => 'user'], function () {
-    Route::get('/', 'UserController@index');
+    Route::get('/', 'Api\UserController@index');
 });
 
 Route::group(['prefix' => 'category'], function () {
-    Route::get('/', 'CategoryController@index');
+    Route::get('/', 'Api\CategoryController@index');
 });
 
 Route::group(['prefix' => 'tag'], function () {
-    Route::get('/', 'TagController@index');
+    Route::get('/', 'Api\TagController@index');
 });
