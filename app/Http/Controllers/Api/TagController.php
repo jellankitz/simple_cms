@@ -8,14 +8,16 @@ use App\Tag;
 
 class TagController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+    
+    private $tag = null;
+    
+    public function __construct(Tag $tag) {
+        $this->tag = $tag;
+    }
+    
     public function index()
     {
-        $tags = Tag::all();
+        $tags = $this->tag->get();
         return $tags;
     }
 

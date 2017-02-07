@@ -28,7 +28,7 @@ class PostController extends Controller {
         $posts = $this->post->with('category')
                 ->with('tags')
                 ->get();
-        return $posts;
+        return response()->json($posts);
     }
 
     /**
@@ -50,6 +50,19 @@ class PostController extends Controller {
             $insert = $this->post->create($data);
 
             if ($insert) {
+                
+                if(is_array($data['tags']) && count($data['tags']) > 0){
+                    $tag_model = new Tag();
+                    foreach($data['tags'] as $tag){
+                        $tag_slug = Helper::getSlug($tag, $tag_model, "name");
+                        Tag::create([
+                            'post_id' => $insert->id,
+                            'name' => $tag,
+                            'slug' => $tag_slug
+                        ]);
+                    }
+                }
+                
                 return response()->json([
                             'success' => 1,
                             'message' => 'Added post successfully!',
@@ -92,6 +105,11 @@ class PostController extends Controller {
             $update = $this->post->find($id)->update($data);
 
             if ($update) {
+                $tags = Tag::whereIn('id',$data['tags'])->get();
+                Tag::where('post_id','=',$id)->delete();
+                
+                $this->post->find($id)->tags()->saveMany($tags);
+                
                 return response()->json(['success' => 1, 'message' => 'Updated post successfully!', 'data' => $this->index()], 200);
             }
 

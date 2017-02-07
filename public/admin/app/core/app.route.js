@@ -1,8 +1,8 @@
-(function () {
+(function() {
     'use strict';
 
     angular.module('app')
-            .config(config);
+        .config(config);
 
     config.$inject = ['$stateProvider', '$urlRouterProvider'];
 
@@ -11,7 +11,7 @@
 
         // For any unmatched url, redirect to /login 
         $urlRouterProvider.otherwise("/auth");
-        
+
         //////STATES//////
 
         //admin navigation menu
@@ -45,7 +45,7 @@
                     controller: "DashboardController",
                     controllerAs: "vm",
                     resolve: {
-                        auth: doAuth,
+                        //doAuth: doAuth,
                         usersPrepService: usersPrepService
                     }
                 },
@@ -62,14 +62,14 @@
                     controller: "PostController",
                     controllerAs: "vm",
                     resolve: {
-                        auth: doAuth,
+                        //doAuth: doAuth,
                         postPrepService: postPrepService
                     }
                 },
                 "nav": nav
             }
         };
-        
+
         var postAdd = {
             name: "post.add",
             url: "/add",
@@ -80,12 +80,14 @@
                     controller: "PostAddController",
                     controllerAs: "vm",
                     resolve: {
-                        auth: doAuth
+                        //doAuth: doAuth,
+                        categoryPrepService: categoryPrepService,
+                        tagPrepService: tagPrepService
                     }
                 }
             }
         };
-        
+
         var postEdit = {
             name: "post.edit",
             url: "/edit/:id",
@@ -96,7 +98,9 @@
                     controller: "PostEditController",
                     controllerAs: "vm",
                     resolve: {
-                        auth: doAuth
+                        //doAuth: doAuth,
+                        categoryPrepService: categoryPrepService,
+                        tagPrepService: tagPrepService
                     }
                 }
             }
@@ -111,7 +115,7 @@
                     controller: "CategoryController",
                     controllerAs: "vm",
                     resolve: {
-                        auth: doAuth,
+                        //doAuth: doAuth,
                         categoryPrepService: categoryPrepService
                     }
                 },
@@ -128,59 +132,59 @@
                     controller: "TagController",
                     controllerAs: "vm",
                     resolve: {
-                        auth: doAuth,
+                        //doAuth: doAuth,
                         tagPrepService: tagPrepService
                     }
                 },
                 "nav": nav
             }
         };
-        
+
         ////////////
-        
+
         $stateProvider
-                .state(auth)
-                .state(dashboard)
-                .state(post)
-                .state(postAdd)
-                .state(postEdit)
-                .state(category)
-                .state(tag);
-        
+            .state(auth)
+            .state(dashboard)
+            .state(post)
+            .state(postAdd)
+            .state(postEdit)
+            .state(category)
+            .state(tag);
+
         ////////////
 
         navPrepService.$inject = ['NavService'];
         /* @ngInject */
         function navPrepService(NavService) {
-            NavService.getNavs();
-            return NavService;
+            //NavService.getNavs();
+            return NavService.getNavs();
         }
 
         usersPrepService.$inject = ['UserService'];
         /* @ngInject */
         function usersPrepService(UserService) {
-            UserService.getUsers();
-            return UserService;
+            return UserService.getUsers();
         }
 
         postPrepService.$inject = ['PostService'];
         /* @ngInject */
         function postPrepService(PostService) {
-            return PostService;
+            return PostService.getPosts();
+            //return PostService;
         }
 
         categoryPrepService.$inject = ['CategoryService'];
         /* @ngInject */
         function categoryPrepService(CategoryService) {
-            CategoryService.getCategories();
-            return CategoryService;
+            return CategoryService.getCategories();
+            //return CategoryService;
         }
 
         tagPrepService.$inject = ['TagService'];
         /* @ngInject */
         function tagPrepService(TagService) {
-            TagService.getTags();
-            return TagService;
+            return TagService.getTags();
+            //return TagService;
         }
 
         doAuth.$inject = ['$auth', '$q', '$injector'];

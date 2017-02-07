@@ -22,14 +22,5 @@ Route::group(['prefix' => 'nav'], function () {
     Route::get('/', 'Api\NavigationController@index');
 });
 
-Route::group(['prefix' => 'user'], function () {
-    Route::get('/', 'Api\UserController@index');
-});
 
-Route::group(['prefix' => 'category'], function () {
-    Route::get('/', 'Api\CategoryController@index');
-});
 
-Route::group(['prefix' => 'tag'], function () {
-    Route::get('/', 'Api\TagController@index');
-});

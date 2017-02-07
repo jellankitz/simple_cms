@@ -75,7 +75,11 @@ class RouteServiceProvider extends ServiceProvider
         ], function ($router) {
             require base_path('routes/api.php');
             //routes in routes/api folder
-            require base_path('routes/api/post.php');
+            foreach (glob(base_path('routes/api/*.php')) as $filename)
+            {
+                require $filename;
+            }
+            
         });
     }
 }

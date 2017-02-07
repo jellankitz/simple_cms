@@ -7,7 +7,7 @@
   |
  */
 
-Route::group(['prefix' => 'post'], function () {
+Route::group(['middleware' => ['jwt.auth'], 'prefix' => 'post'], function () {
     Route::get('/', 'Api\PostController@index');
     Route::post('/add', 'Api\PostController@store');
     Route::post('/edit', 'Api\PostController@update');

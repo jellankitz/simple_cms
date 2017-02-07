@@ -1,21 +1,35 @@
-(function(){
+(function() {
     'use strict';
-    
+
     angular.module('app')
-            .controller('NavController', NavController);
-    
-    NavController.$inject = ['$auth', '$rootScope', 'navPrepService']
-    
+        .controller('NavController', NavController);
+
+    NavController.$inject = ['$auth', '$rootScope', 'NavService', 'navPrepService']
+
     /* @ngInject */
-    function NavController($auth, $rootScope, navPrepService){
+    function NavController($auth, $rootScope, NavService, navPrepService) {
         var vm = this;
         vm.logout = logout;
-        vm.navs = navPrepService.navs;
-        vm.error = navPrepService.errors;
-        
+        vm.navs = navPrepService;
+        vm.getNavs = getNavs;
+
+        activate();
+
         /////////////
-        
-        function logout(){
+
+        function activate() {
+            return getNavs();
+        }
+
+        function getNavs() {
+            return NavService.getNavs().then(function(data) {
+                vm.navs = data;
+
+                return vm.navs;
+            });
+        }
+
+        function logout() {
             $auth.logout().then(function() {
 
                 // Remove the authenticated user from local storage

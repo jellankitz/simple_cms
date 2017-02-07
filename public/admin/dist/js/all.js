@@ -369,6 +369,15 @@ c=c.replace(q,function(a){p=a;return""});e=e||{};t(m.urlParams,function(a,b){h=e
         /* Features */
     ]);
 })();
+(function () {
+    'use strict';
+
+    angular.module('app')
+            .constant('CONST', {
+                api_domain: "http://localhost:8000/api/"
+            });
+
+})();
 (function(){
     'use strict';
     
@@ -380,42 +389,32 @@ c=c.replace(q,function(a){p=a;return""});e=e||{};t(m.urlParams,function(a,b){h=e
     ]);
             
 })();
-(function () {
+(function() {
     'use strict';
 
     angular.module('app')
-            .constant('CONST', {
-                api_domain: "http://localhost:8000/api/"
-            });
+        .config(config)
+        .run(run);
 
-})();
-(function () {
-    'use strict';
-
-    angular.module('app')
-            .config(config)
-            .run(run);
-
-    config.$inject = ['$authProvider', '$resourceProvider'];
+    config.$inject = ['$authProvider', '$resourceProvider','CONST'];
 
     /* @ngInject */
-    function config($authProvider, $resourceProvider) {
+    function config($authProvider, $resourceProvider, CONST) {
 
-        $authProvider.loginUrl = 'http://localhost:8000/api/authenticate';
+        $authProvider.loginUrl = CONST.api_domain+'authenticate';
         $resourceProvider.defaults.stripTrailingSlashes = false;
-
     }
 
-    run.$inject = ['$rootScope', '$state', '$auth','bootstrap3ElementModifier'];
+    run.$inject = ['$rootScope', '$state', '$auth', 'bootstrap3ElementModifier'];
     /* @ngInject */
     function run($rootScope, $state, $auth, bootstrap3ElementModifier) {
         bootstrap3ElementModifier.enableValidationStateIcons(true);
-        
+
         // $stateChangeStart is fired whenever the state changes. We can use some parameters
         // such as toState to hook into details about the state as it is changing
-        $rootScope.$on('$stateChangeStart', function (event, toState) {
+        $rootScope.$on('$stateChangeStart', function(event, toState) {
             
-            if(localStorage.getItem('user') != 'undefined'){
+            if (localStorage.getItem('user') != 'undefined') {
                 // Grab the user from local storage and parse it to an object
                 var user = JSON.parse(localStorage.getItem('user'));
 
@@ -424,7 +423,6 @@ c=c.replace(q,function(a){p=a;return""});e=e||{};t(m.urlParams,function(a,b){h=e
                 // otherwise not actually authenticated, they will be redirected to
                 // the auth state because of the rejected request anyway
                 if (user && $auth.isAuthenticated()) {
-
                     // The user's authenticated state gets flipped to
                     // true so we can now show parts of the UI that rely
                     // on the user being logged in
@@ -434,11 +432,10 @@ c=c.replace(q,function(a){p=a;return""});e=e||{};t(m.urlParams,function(a,b){h=e
                     // us to access it anywhere across the app. Here
                     // we are grabbing what is in local storage
                     $rootScope.currentUser = user;
-
+                    
                     // If the user is logged in and we hit the auth route we don't need
                     // to stay there and can send the user to the main state
                     if (toState.name === "auth") {
-
                         // Preventing the default behavior allows us to use $state.go
                         // to change states
                         event.preventDefault();
@@ -446,7 +443,7 @@ c=c.replace(q,function(a){p=a;return""});e=e||{};t(m.urlParams,function(a,b){h=e
                         // go to the "main" state which in our case is users
                         $state.go('dashboard');
                     }
-                }else{
+                } else {
                     // Remove the authenticated user from local storage
                     localStorage.removeItem('user');
                     // Flip authenticated to false so that we no longer
@@ -455,16 +452,21 @@ c=c.replace(q,function(a){p=a;return""});e=e||{};t(m.urlParams,function(a,b){h=e
 
                     // Remove the current user info from rootscope
                     $rootScope.currentUser = null;
+
+                    if (toState.name !== "auth") {
+                        event.preventDefault();
+                        $state.go('auth');
+                    }
                 }
-            }
+            } 
         });
     }
 })();
-(function () {
+(function() {
     'use strict';
 
     angular.module('app')
-            .config(config);
+        .config(config);
 
     config.$inject = ['$stateProvider', '$urlRouterProvider'];
 
@@ -473,7 +475,7 @@ c=c.replace(q,function(a){p=a;return""});e=e||{};t(m.urlParams,function(a,b){h=e
 
         // For any unmatched url, redirect to /login 
         $urlRouterProvider.otherwise("/auth");
-        
+
         //////STATES//////
 
         //admin navigation menu
@@ -507,7 +509,7 @@ c=c.replace(q,function(a){p=a;return""});e=e||{};t(m.urlParams,function(a,b){h=e
                     controller: "DashboardController",
                     controllerAs: "vm",
                     resolve: {
-                        auth: doAuth,
+                        //doAuth: doAuth,
                         usersPrepService: usersPrepService
                     }
                 },
@@ -524,14 +526,14 @@ c=c.replace(q,function(a){p=a;return""});e=e||{};t(m.urlParams,function(a,b){h=e
                     controller: "PostController",
                     controllerAs: "vm",
                     resolve: {
-                        auth: doAuth,
+                        //doAuth: doAuth,
                         postPrepService: postPrepService
                     }
                 },
                 "nav": nav
             }
         };
-        
+
         var postAdd = {
             name: "post.add",
             url: "/add",
@@ -542,12 +544,14 @@ c=c.replace(q,function(a){p=a;return""});e=e||{};t(m.urlParams,function(a,b){h=e
                     controller: "PostAddController",
                     controllerAs: "vm",
                     resolve: {
-                        auth: doAuth
+                        //doAuth: doAuth,
+                        categoryPrepService: categoryPrepService,
+                        tagPrepService: tagPrepService
                     }
                 }
             }
         };
-        
+
         var postEdit = {
             name: "post.edit",
             url: "/edit/:id",
@@ -558,7 +562,9 @@ c=c.replace(q,function(a){p=a;return""});e=e||{};t(m.urlParams,function(a,b){h=e
                     controller: "PostEditController",
                     controllerAs: "vm",
                     resolve: {
-                        auth: doAuth
+                        //doAuth: doAuth,
+                        categoryPrepService: categoryPrepService,
+                        tagPrepService: tagPrepService
                     }
                 }
             }
@@ -573,7 +579,7 @@ c=c.replace(q,function(a){p=a;return""});e=e||{};t(m.urlParams,function(a,b){h=e
                     controller: "CategoryController",
                     controllerAs: "vm",
                     resolve: {
-                        auth: doAuth,
+                        //doAuth: doAuth,
                         categoryPrepService: categoryPrepService
                     }
                 },
@@ -590,59 +596,59 @@ c=c.replace(q,function(a){p=a;return""});e=e||{};t(m.urlParams,function(a,b){h=e
                     controller: "TagController",
                     controllerAs: "vm",
                     resolve: {
-                        auth: doAuth,
+                        //doAuth: doAuth,
                         tagPrepService: tagPrepService
                     }
                 },
                 "nav": nav
             }
         };
-        
+
         ////////////
-        
+
         $stateProvider
-                .state(auth)
-                .state(dashboard)
-                .state(post)
-                .state(postAdd)
-                .state(postEdit)
-                .state(category)
-                .state(tag);
-        
+            .state(auth)
+            .state(dashboard)
+            .state(post)
+            .state(postAdd)
+            .state(postEdit)
+            .state(category)
+            .state(tag);
+
         ////////////
 
         navPrepService.$inject = ['NavService'];
         /* @ngInject */
         function navPrepService(NavService) {
-            NavService.getNavs();
-            return NavService;
+            //NavService.getNavs();
+            return NavService.getNavs();
         }
 
         usersPrepService.$inject = ['UserService'];
         /* @ngInject */
         function usersPrepService(UserService) {
-            UserService.getUsers();
-            return UserService;
+            return UserService.getUsers();
         }
 
         postPrepService.$inject = ['PostService'];
         /* @ngInject */
         function postPrepService(PostService) {
-            return PostService;
+            return PostService.getPosts();
+            //return PostService;
         }
 
         categoryPrepService.$inject = ['CategoryService'];
         /* @ngInject */
         function categoryPrepService(CategoryService) {
-            CategoryService.getCategories();
-            return CategoryService;
+            return CategoryService.getCategories();
+            //return CategoryService;
         }
 
         tagPrepService.$inject = ['TagService'];
         /* @ngInject */
         function tagPrepService(TagService) {
-            TagService.getTags();
-            return TagService;
+            return TagService.getTags();
+            //return TagService;
         }
 
         doAuth.$inject = ['$auth', '$q', '$injector'];
@@ -661,88 +667,109 @@ c=c.replace(q,function(a){p=a;return""});e=e||{};t(m.urlParams,function(a,b){h=e
     }
 
 })();
-(function(){
+(function() {
     'use strict';
-    
+
     angular.module('app')
-            .factory('HelperService', HelperService);
-    
+        .factory('HelperService', HelperService);
+
     HelperService.$inject = ['$state'];
-    
+
     /* @ngInject */
-    function HelperService($state){
+    function HelperService($state) {
         var service = {
             getCurrentState: getCurrentState,
             getPrevState: getPrevState,
             removeFromList: removeFromList,
             addToList: addToList,
             refreshList: refreshList,
+            emptyList: emptyList
         }
-        
+
         return service;
-        
+
         ////////////////
-        
-        function getCurrentState(){
+
+        function getCurrentState() {
             return $state;
         }
-        
-        function getPrevState(){
+
+        function getPrevState() {
             var prevState = $state.current.parent;
-            
-            if(typeof prevState != 'undefined'){
+
+            if (typeof prevState != 'undefined') {
                 return prevState;
             }
-            
+
             return false;
         }
-        
-        function removeFromList(list, id){
-            for(var x = 0; x < list.length; x++){
-                if(list[x].id == id){
-                    list.splice(x,1);
+
+        function removeFromList(list, id) {
+            for (var x = 0; x < list.length; x++) {
+                if (list[x].id == id) {
+                    list.splice(x, 1);
                 }
             }
-            
+
             return list;
         }
-        
-        function addToList(list, newData){
+
+        function addToList(list, newData) {
             list.push(newData);
-            
+
             return list;
         }
-        
-        function refreshList(list, data){
-            list.splice(0,list.length);
-            
-            for(var x = 0; x < data.length; x++){
+
+        function refreshList(list, data) {
+            list.splice(0, list.length);
+
+            for (var x = 0; x < data.length; x++) {
                 list.push(data[x]);
             }
-            
+
+            return list;
+        }
+
+        function emptyList(list) {
+            list.splice(0, list.length);
+
             return list;
         }
     }
-    
+
 })();
-(function(){
+(function() {
     'use strict';
-    
+
     angular.module('app')
-            .controller('NavController', NavController);
-    
-    NavController.$inject = ['$auth', '$rootScope', 'navPrepService']
-    
+        .controller('NavController', NavController);
+
+    NavController.$inject = ['$auth', '$rootScope', 'NavService', 'navPrepService']
+
     /* @ngInject */
-    function NavController($auth, $rootScope, navPrepService){
+    function NavController($auth, $rootScope, NavService, navPrepService) {
         var vm = this;
         vm.logout = logout;
-        vm.navs = navPrepService.navs;
-        vm.error = navPrepService.errors;
-        
+        vm.navs = navPrepService;
+        vm.getNavs = getNavs;
+
+        activate();
+
         /////////////
-        
-        function logout(){
+
+        function activate() {
+            return getNavs();
+        }
+
+        function getNavs() {
+            return NavService.getNavs().then(function(data) {
+                vm.navs = data;
+
+                return vm.navs;
+            });
+        }
+
+        function logout() {
             $auth.logout().then(function() {
 
                 // Remove the authenticated user from local storage
@@ -757,127 +784,232 @@ c=c.replace(q,function(a){p=a;return""});e=e||{};t(m.urlParams,function(a,b){h=e
         }
     }
 })();
-(function(){
+(function() {
     'use strict';
-    
+
     angular.module('app')
-            .factory('NavService', NavService);
-    
+        .factory('NavService', NavService);
+
     NavService.$inject = ['$http', 'CONST', '$q'];
-    
+
     /* @ngInject */
-    function NavService($http, CONST, $q){
+    function NavService($http, CONST, $q) {
         var api = CONST.api_domain + 'nav/';
         var d = $q.defer();
-        
+
         var service = {
-            navs: {},
-            errors: {},
+            navs: [],
+            errors: [],
             getNavs: getNavs
         }
-        
+
         return service;
-        
+
         ////////////////
-        
-        function getNavs(){
+
+        function getNavs() {
+            var d = $q.defer();
+
             $http.get(api)
-                    .then(success)
-                    .catch(error);
-        }
-        
-        function success(data){
-            service.navs = data.data;
-            d.resolve();
-            return d.promise;
-        }
-        
-        function error(error){
-            service.errors = error;
-            d.reject();
+                .then(function(data) {
+                    d.resolve(data.data);
+                })
+                .catch(function(error) {
+                    service.errors = error;
+                    d.reject();
+                });
+
             return d.promise;
         }
     }
-    
+
 })();
-(function(){
+(function() {
     'use strict';
-    
+
     angular.module('app')
-            .controller('LoginController', LoginController);
-    
-    LoginController.$inject = ['$auth','$state','$http', '$rootScope'];
-    
+        .factory('AuthService', AuthService);
+
+    AuthService.$inject = ['$auth', '$rootScope', '$http', '$q', '$injector'];
+
     /* @ngInject */
-    function LoginController($auth, $state, $http, $rootScope){
+    function AuthService($auth, $rootScope, $http, $q, $injector) {
+        var service = {
+            login: login,
+            errors: [],
+            isAuthenticated: isAuthenticated,
+            createAuthUser: createAuthUser,
+            destroyAuthUser: destroyAuthUser,
+            getAuthUser: getAuthUser
+        }
+
+        return service;
+
+        ////////////////
+
+        function login(email, password) {
+            var d = $q.defer();
+
+            var credentials = {
+                email: email,
+                password: password
+            }
+
+            $auth.login(credentials).then(function(data) {
+                return $http.get('api/authenticate/user');
+            }, function(error) {
+                service.errors = error.data.error;
+                d.reject(service.errors);
+                throw (service.errors);
+            }).then(function(response) {
+                if (typeof response === 'undefined' || response === false) {
+                    d.reject();
+                } else {
+                    var user = JSON.stringify(response.data.user);
+
+                    localStorage.setItem('user', user);
+                    $rootScope.authenticated = true;
+                    $rootScope.currentUser = response.data.user;
+
+                    d.resolve();
+                }
+
+            });
+
+            return d.promise;
+        }
+
+        function isAuthenticated() {
+            /*
+            if (localStorage.getItem('user') != 'undefined') {
+                var user = JSON.parse(localStorage.getItem('user'));
+
+                if (user && $auth.isAuthenticated()) {
+                    return true;
+                }
+            }
+
+            return false;*/
+
+            var d = $q.defer();
+            var $state = $injector.get('$state');
+            if ($auth.isAuthenticated()) {
+                d.resolve();
+            } else {
+                d.reject();
+                $state.go('auth');
+            }
+
+            return d.promise;
+        }
+
+        function createAuthUser() {
+            var user = JSON.parse(localStorage.getItem('user'));
+            if (user && $auth.isAuthenticated()) {
+                $rootScope.authenticated = true;
+                $rootScope.currentUser = user;
+            }
+        }
+
+        function destroyAuthUser() {
+            localStorage.removeItem('user');
+            $rootScope.authenticated = false;
+            $rootScope.currentUser = null;
+        }
+
+        function getAuthUser() {
+            if (service.isAuthenticated) {
+                return JSON.parse(localStorage.getItem('user'));
+            }
+
+            return null;
+        }
+    }
+
+})();
+(function() {
+    'use strict';
+
+    angular.module('app')
+        .controller('LoginController', LoginController);
+
+    LoginController.$inject = ['AuthService', '$state'];
+
+    /* @ngInject */
+    function LoginController(AuthService, $state) {
         var vm = this;
-        
+
         vm.email = "";
         vm.password = "";
         vm.login = login;
-        
+
         ///////////
-        
-        function login(){
-            
-            var credentials = {
-                email: vm.email,
-                password: vm.password
-            }
-            
-            // Use Satellizer's $auth service to login
-            $auth.login(credentials).then(function(data) {
-                // If login is successful, redirect to dashboard state
-                return $http.get('api/authenticate/user');
-                
+
+        function login() {
+
+            AuthService.login(vm.email, vm.password).then(function(response) {
+                $state.go('dashboard');
             }, function(error) {
                 vm.loginError = true;
-                vm.loginErrorText = error.data.error;
-                
-                return false;
-            // Because we returned the $http.get request in the $auth.login
-            // promise, we can chain the next promise to the end here
-            }).then(function(response) {
-                if(response === false){
-                    return false;
-                }
-                // Stringify the returned data to prepare it
-                // to go into local storage
-                var user = JSON.stringify(response.data.user);
-
-                // Set the stringified user data into local storage
-                localStorage.setItem('user', user);
-
-                // The user's authenticated state gets flipped to
-                // true so we can now show parts of the UI that rely
-                // on the user being logged in
-                $rootScope.authenticated = true;
-
-                // Putting the user's data on $rootScope allows
-                // us to access it anywhere across the app
-                $rootScope.currentUser = response.data.user;
-
-                // Everything worked out so we can now redirect to
-                // the users state to view the data
-                $state.go('dashboard');
+                vm.loginErrorText = error;
             });
         }
     }
 })();
-(function(){
+(function() {
     'use strict';
-    
+
     angular.module('app')
-            .controller('DashboardController', DashboardController);
-    
-    DashboardController.$inject = ['usersPrepService'];
-    
+        .service('Session', Session);
+
+    function Session() {
+        var self = this;
+
+        self.user = null;
+        self.create = create;
+        self.destroy = destroy;
+
+        ////////////////
+
+        function create(authUser) {
+            self.user = authUser;
+        }
+
+        function destroy() {
+            self.user = null;
+        }
+    }
+
+})();
+(function() {
+    'use strict';
+
+    angular.module('app')
+        .controller('DashboardController', DashboardController);
+
+    DashboardController.$inject = ['UserService', 'usersPrepService'];
+
     /* @ngInject */
-    function DashboardController(usersPrepService){
+    function DashboardController(UserService, usersPrepService) {
         var vm = this;
-        vm.users = usersPrepService.users;
-        vm.error = usersPrepService.errors;
-        
+
+        vm.users = usersPrepService;
+        vm.getUsers = getUsers;
+
+        activate();
+
+        //////////////
+
+        function activate() {
+            return getUsers();
+        }
+
+        function getUsers() {
+            return UserService.getUsers().then(function(data) {
+                vm.users = data;
+                return vm.users;
+            });
+        }
     }
 })();
 (function(){
@@ -893,175 +1025,197 @@ c=c.replace(q,function(a){p=a;return""});e=e||{};t(m.urlParams,function(a,b){h=e
     }
     
 })();
-(function(){
+(function() {
     'use strict';
-    
+
     angular.module('app')
-            .factory('UserService', UserService);
-    
+        .factory('UserService', UserService);
+
     UserService.$inject = ['$http', 'CONST', '$q'];
-    
+
     /* @ngInject */
-    function UserService($http, CONST, $q){
+    function UserService($http, CONST, $q) {
         var api = CONST.api_domain + 'user/';
         var d = $q.defer();
-        
+
         var service = {
-            users: {},
-            errors: {},
+            users: [],
+            errors: [],
             getUsers: getUsers
         }
-        
+
         return service;
-        
+
         ////////////////
-        
-        function getUsers(){
+
+        function getUsers() {
+            var d = $q.defer();
+
             $http.get(api)
-                    .then(success)
-                    .catch(error);
-        }
-        
-        function success(data){
-            service.users = data.data;
-            d.resolve();
-            return d.promise;
-        }
-        
-        function error(error){
-            service.errors = error;
-            d.reject();
+                .then(function(data) {
+                    d.resolve(data.data);
+                })
+                .catch(function(error) {
+                    service.errors = error;
+                    d.reject();
+                });
+
             return d.promise;
         }
     }
-    
+
 })();
-(function(){
+(function() {
     'use strict';
-    
+
     angular.module('app')
-            .controller('CategoryController', CategoryController);
-    
-    CategoryController.$inject = ['categoryPrepService'];
-    
+        .controller('CategoryController', CategoryController);
+
+    CategoryController.$inject = ['CategoryService', 'categoryPrepService'];
+
     /* @ngInject */
-    function CategoryController(categoryPrepService){
+    function CategoryController(CategoryService, categoryPrepService) {
         var vm = this;
-        vm.categories = categoryPrepService.categories;
-        vm.error = categoryPrepService.errors;
-        
+
+        vm.categories = categoryPrepService;
+        vm.getCategories = getCategories;
+
+        activate();
+
+        /////////////////
+
+        function activate() {
+            return getCategories();
+        }
+
+        function getCategories() {
+            return CategoryService.getCategories().then(function(data) {
+                vm.categories = data;
+                return vm.categories;
+            });
+        }
+
     }
 })();
-(function(){
+(function() {
     'use strict';
-    
+
     angular.module('app')
-            .factory('CategoryService', CategoryService);
-    
-    CategoryService.$inject = ['$http', 'CONST', '$q'];
-    
+        .factory('CategoryService', CategoryService);
+
+    CategoryService.$inject = ['$http', 'CONST', '$q', 'AuthService', 'HelperService'];
+
     /* @ngInject */
-    function CategoryService($http, CONST, $q){
+    function CategoryService($http, CONST, $q, AuthService, HelperService) {
         var api = CONST.api_domain + 'category/';
-        var d = $q.defer();
-        
+
         var service = {
-            categories: {},
-            errors: {},
+            categories: [],
+            errors: [],
             getCategories: getCategories
         }
-        
+
         return service;
-        
+
         ////////////////
-        
-        function getCategories(){
+
+        function getCategories() {
+            var d = $q.defer();
+
+            HelperService.emptyList(service.categories);
+
             $http.get(api)
-                    .then(success)
-                    .catch(error);
-        }
-        
-        function success(data){
-            service.categories = data.data;
-            d.resolve();
-            return d.promise;
-        }
-        
-        function error(error){
-            service.errors = error;
-            d.reject();
+                .then(function(data) {
+                    //service.categories = data.data;
+                    d.resolve(data.data);
+                })
+                .catch(function(error) {
+                    service.errors = error;
+                    d.reject(error);
+                });
             return d.promise;
         }
     }
-    
+
 })();
-(function(){
+(function() {
     'use strict';
-    
+
     angular.module('app')
-            .controller('PostAddController', PostAddController);
-    
-    PostAddController.$inject = ['PostService','HelperService'];
-    
+        .controller('PostAddController', PostAddController);
+
+    PostAddController.$inject = ['PostService', 'HelperService', 'categoryPrepService', 'tagPrepService', '$scope'];
+
     /* @ngInject */
-    function PostAddController(PostService, HelperService){
+    function PostAddController(PostService, HelperService, categoryPrepService, tagPrepService, $scope) {
         var vm = this;
-        
+
         vm.mode = "Add";
-        vm.title = "";
-        vm.content = "";
+        vm.postForm = {};
         vm.response = {};
         vm.isDone = false;
-        
+        vm.categories = categoryPrepService;
+        vm.defaultCategory = vm.categories[0].id;
+        vm.tags = tagPrepService;
+
         vm.prevState = HelperService.getPrevState();
         vm.submitAction = addPost;
-        
+
         ///////////////////
-        
-        function addPost(){
-            var data = setData();
-            PostService.addPost(data).then(function(){
+
+        function addPost() {
+            var tags = vm.postForm.temp_tags != undefined ? vm.postForm.temp_tags.split(" ") : "";
+            vm.postForm.tags = tags;
+            //console.log(vm.postForm); return false;
+            PostService.addPost(vm.postForm).then(function() {
                 vm.response['success'] = "alert-success";
                 vm.response['alert'] = "Success!";
                 vm.response['msg'] = "Added new post.";
                 vm.isDone = true;
-            }).catch(function(){
+                //HelperService.getParent().getPosts();
+                $scope.$parent.vm.getPosts();
+            }).catch(function() {
                 vm.response['success'] = "alert-danger";
                 vm.response['alert'] = "Error!";
                 vm.response['msg'] = "Failed to add new post.";
                 vm.isDone = true;
             });
         }
-        
-        function setData(){
-            return {
-                title: vm.title,
-                content: vm.content
-            };
-        }
     }
 })();
-(function(){
+(function() {
     'use strict';
-    
+
     angular.module('app')
-            .controller('PostController', PostController);
-    
-    PostController.$inject = ['postPrepService'];
-    
+        .controller('PostController', PostController);
+
+    PostController.$inject = ['PostService', 'postPrepService'];
+
     /* @ngInject */
-    function PostController(postPrepService){
+    function PostController(PostService, postPrepService) {
         var vm = this;
-        
-        vm.posts = postPrepService.posts;
-        vm.error = postPrepService.errors;
+
+        vm.posts = postPrepService;
+        vm.getPosts = getPosts;
         vm.hasDeleted = false;
         vm.response = {};
-        
         vm.deletePost = deletePost;
-        
+
+        activate();
+
         ////////////////
-        
+
+        function activate() {
+            return getPosts();
+        }
+
+        function getPosts() {
+            return PostService.getPosts().then(function(data) {
+                vm.posts = data;
+                return vm.posts;
+            });
+        }
+
         function deletePost(post) {
             bootbox.confirm({
                 title: "Confirm Delete",
@@ -1076,26 +1230,24 @@ c=c.replace(q,function(a){p=a;return""});e=e||{};t(m.urlParams,function(a,b){h=e
                         className: 'btn-danger'
                     }
                 },
-                callback: function (result) {
-                    if(result){
+                callback: function(result) {
+                    if (result) {
                         doDelete(post.id);
                     }
                 }
             });
-            
+
         }
-        
-        function doDelete(id){
-            postPrepService.deletePost(id).then(function (resp) {
+
+        function doDelete(id) {
+            PostService.deletePost(id).then(function(resp) {
                 vm.hasDeleted = true;
-                
                 vm.response['success'] = "alert-success";
                 vm.response['alert'] = "Success!";
                 vm.response['msg'] = resp.data.message;
-                vm.posts = postPrepService.posts;
-                
+                getPosts();
                 vm.hasAdded = true;
-            }).catch(function () {
+            }).catch(function() {
                 vm.response['success'] = "alert-danger";
                 vm.response['alert'] = "Error!";
                 vm.response['msg'] = "Failed to delete post.";
@@ -1104,60 +1256,54 @@ c=c.replace(q,function(a){p=a;return""});e=e||{};t(m.urlParams,function(a,b){h=e
         }
     }
 })();
-(function(){
+(function() {
     'use strict';
-    
+
     angular.module('app')
-            .controller('PostEditController', PostEditController);
-    
-    PostEditController.$inject = ['PostService','HelperService','$stateParams'];
-    
+        .controller('PostEditController', PostEditController);
+
+    PostEditController.$inject = ['PostService', 'HelperService', '$stateParams', 'categoryPrepService', 'tagPrepService'];
+
     /* @ngInject */
-    function PostEditController(PostService, HelperService, $stateParams){
+    function PostEditController(PostService, HelperService, $stateParams, categoryPrepService, tagPrepService) {
         var vm = this;
-        
+
         vm.mode = "Edit";
         vm.postId = $stateParams.id;
         vm.selectedPost = PostService.getPost(vm.postId);
-        vm.title = vm.selectedPost.title;
-        vm.content = vm.selectedPost.content;
+        vm.postForm = vm.selectedPost;
         vm.response = {};
         vm.isDone = false;
-        
+        vm.categories = categoryPrepService;
+        vm.defaultCategory = vm.selectedPost.category_id;
+        vm.tags = tagPrepService;
+        vm.defaultTags = vm.selectedPost.tags;
+
         vm.prevState = HelperService.getPrevState();
         vm.submitAction = editPost;
-        
+
         ///////////////////
-        
-        function editPost(){
-            var data = setData();
-            PostService.editPost(data).then(function(){
+
+        function editPost() {
+            PostService.editPost(vm.postForm).then(function() {
                 vm.response['success'] = "alert-success";
                 vm.response['alert'] = "Success!";
                 vm.response['msg'] = "Updated post.";
                 vm.isDone = true;
-            }).catch(function(){
+            }).catch(function() {
                 vm.response['success'] = "alert-danger";
                 vm.response['alert'] = "Error!";
                 vm.response['msg'] = "Failed to update post.";
                 vm.isDone = true;
             });
         }
-        
-        function setData(){
-            return {
-                id: vm.postId,
-                title: vm.title,
-                content: vm.content
-            };
-        }
     }
 })();
-(function () {
+(function() {
     'use strict';
 
     angular.module('app')
-            .factory('PostService', PostService);
+        .factory('PostService', PostService);
 
     PostService.$inject = ['$http', 'CONST', '$q', 'HelperService'];
 
@@ -1172,39 +1318,33 @@ c=c.replace(q,function(a){p=a;return""});e=e||{};t(m.urlParams,function(a,b){h=e
             editPost: editPost,
             deletePost: deletePost,
             getPosts: getPosts,
-            activate: activate,
             getPost: getPost
         }
 
-        service.activate();
-        
         return service;
-        
+
         //////// SERIVCE METHODS ////////
-        
-        function activate(){
-            return service.getPosts();
-        }
-        
+
         function getPosts() {
             var d = $q.defer();
-            
-            service.posts = [];
-            
+
+            //HelperService.emptyList(service.posts);
+
             $http.get(api)
-                    .then(function (data) {
-                        service.posts = data.data;
-                        d.resolve(data);
-                    })
-                    .catch(function (error) {
-                        console.log(error.data);
-                        service.errors = error;
-                        d.reject(error);
-                    });
+                .then(function(data) {
+                    //console.log(data);
+                    //service.posts = data.data;
+                    d.resolve(data.data);
+                })
+                .catch(function(error) {
+                    //console.log(error.data);
+                    service.errors = error;
+                    d.reject(error);
+                });
 
             return d.promise;
         }
-        
+
         function getPost(id) {
             var selId = parseInt(id);
             for (var i = 0; i < service.posts.length; i++) {
@@ -1215,117 +1355,133 @@ c=c.replace(q,function(a){p=a;return""});e=e||{};t(m.urlParams,function(a,b){h=e
 
             }
         }
-        
+
         function addPost(data) {
             var url = api + "add/";
             var d = $q.defer();
 
             $http.post(url, data)
-                    .then(function (resp) {
-                        HelperService.refreshList(service.posts, resp.data.data);
-                        d.resolve(resp);
-                    }).catch(function(error){
-                        console.log(error.data);
-                        service.errors = error;
-                        d.reject(error);
-                    });
+                .then(function(resp) {
+                    HelperService.refreshList(service.posts, resp.data.data);
+                    d.resolve(resp);
+                }).catch(function(error) {
+                    console.log(error.data);
+                    service.errors = error;
+                    d.reject(error);
+                });
 
             return d.promise;
         }
-        
+
         function editPost(data) {
             var url = api + "edit/";
             var d = $q.defer();
 
             $http.post(url, data)
-                    .then(function (resp) {
-                        HelperService.refreshList(service.posts, resp.data.data);
-                        d.resolve(resp);
-                    }).catch(function(error){
-                        console.log(error.data);
-                        service.errors = error;
-                        d.reject(error);
-                    });
+                .then(function(resp) {
+                    HelperService.refreshList(service.posts, resp.data.data);
+                    d.resolve(resp);
+                }).catch(function(error) {
+                    console.log(error.data);
+                    service.errors = error;
+                    d.reject(error);
+                });
 
             return d.promise;
         }
-        
-        function deletePost(id){
+
+        function deletePost(id) {
             var url = api + "delete/" + id;
             var d = $q.defer();
-            
+
             $http.post(url, {})
-                    .then(function (resp) {
-                        var newPosts = HelperService.removeFromList(service.posts, id);
-                        service.posts = newPosts;
-                        d.resolve(resp);
-                    }).catch(function(error){
-                        console.log(error.data);
-                        service.errors = error;
-                        d.reject(error);
-                    });
+                .then(function(resp) {
+                    //var newPosts = HelperService.removeFromList(service.posts, id);
+                    //service.posts = newPosts;
+                    getPosts();
+                    d.resolve(resp);
+                }).catch(function(error) {
+                    console.log(error.data);
+                    service.errors = error;
+                    d.reject(error);
+                });
 
             return d.promise;
         }
     }
 
 })();
-(function(){
+(function() {
     'use strict';
-    
+
     angular.module('app')
-            .controller('TagController', TagController);
-    
-    TagController.$inject = ['tagPrepService'];
-    
+        .controller('TagController', TagController);
+
+    TagController.$inject = ['TagService', 'tagPrepService'];
+
     /* @ngInject */
-    function TagController(tagPrepService){
+    function TagController(TagService, tagPrepService) {
         var vm = this;
-        vm.tags = tagPrepService.tags;
-        vm.error = tagPrepService.errors;
-        
+
+        vm.tags = tagPrepService;
+        vm.getTags = getTags;
+
+        activate();
+
+        /////////////////
+
+        function activate() {
+            return getTags();
+        }
+
+        function getTags() {
+            return TagService.getTags().then(function(data) {
+                vm.tags = data;
+                return vm.tags;
+            });
+        }
     }
 })();
-(function(){
+(function() {
     'use strict';
-    
+
     angular.module('app')
-            .factory('TagService', TagService);
-    
-    TagService.$inject = ['$http', 'CONST', '$q'];
-    
+        .factory('TagService', TagService);
+
+    TagService.$inject = ['$http', 'CONST', '$q', 'AuthService', 'HelperService'];
+
     /* @ngInject */
-    function TagService($http, CONST, $q){
+    function TagService($http, CONST, $q, AuthService, HelperService) {
         var api = CONST.api_domain + 'tag/';
-        var d = $q.defer();
-        
+
         var service = {
-            tags: {},
-            errors: {},
+            tags: [],
+            errors: [],
             getTags: getTags
         }
-        
+
         return service;
-        
+
         ////////////////
-        
-        function getTags(){
+
+        function getTags() {
+            var d = $q.defer();
+
+            HelperService.emptyList(service.tags);
+
             $http.get(api)
-                    .then(success)
-                    .catch(error);
-        }
-        
-        function success(data){
-            service.tags = data.data;
-            d.resolve();
-            return d.promise;
-        }
-        
-        function error(error){
-            service.errors = error;
-            d.reject();
+                .then(function(data) {
+                    //service.tags = data.data;
+                    d.resolve(data.data);
+                })
+                .catch(function(error) {
+                    throw (error);
+                    service.errors = error;
+                    d.reject();
+                });
+
             return d.promise;
         }
     }
-    
+
 })();

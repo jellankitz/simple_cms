@@ -1,43 +1,41 @@
-(function(){
+(function() {
     'use strict';
-    
+
     angular.module('app')
-            .factory('CategoryService', CategoryService);
-    
-    CategoryService.$inject = ['$http', 'CONST', '$q'];
-    
+        .factory('CategoryService', CategoryService);
+
+    CategoryService.$inject = ['$http', 'CONST', '$q', 'AuthService', 'HelperService'];
+
     /* @ngInject */
-    function CategoryService($http, CONST, $q){
+    function CategoryService($http, CONST, $q, AuthService, HelperService) {
         var api = CONST.api_domain + 'category/';
-        var d = $q.defer();
-        
+
         var service = {
-            categories: {},
-            errors: {},
+            categories: [],
+            errors: [],
             getCategories: getCategories
         }
-        
+
         return service;
-        
+
         ////////////////
-        
-        function getCategories(){
+
+        function getCategories() {
+            var d = $q.defer();
+
+            HelperService.emptyList(service.categories);
+
             $http.get(api)
-                    .then(success)
-                    .catch(error);
-        }
-        
-        function success(data){
-            service.categories = data.data;
-            d.resolve();
-            return d.promise;
-        }
-        
-        function error(error){
-            service.errors = error;
-            d.reject();
+                .then(function(data) {
+                    //service.categories = data.data;
+                    d.resolve(data.data);
+                })
+                .catch(function(error) {
+                    service.errors = error;
+                    d.reject(error);
+                });
             return d.promise;
         }
     }
-    
+
 })();

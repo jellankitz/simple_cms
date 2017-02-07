@@ -1,24 +1,36 @@
-(function(){
+(function() {
     'use strict';
-    
+
     angular.module('app')
-            .controller('PostController', PostController);
-    
-    PostController.$inject = ['postPrepService'];
-    
+        .controller('PostController', PostController);
+
+    PostController.$inject = ['PostService', 'postPrepService'];
+
     /* @ngInject */
-    function PostController(postPrepService){
+    function PostController(PostService, postPrepService) {
         var vm = this;
-        
-        vm.posts = postPrepService.posts;
-        vm.error = postPrepService.errors;
+
+        vm.posts = postPrepService;
+        vm.getPosts = getPosts;
         vm.hasDeleted = false;
         vm.response = {};
-        
         vm.deletePost = deletePost;
-        
+
+        activate();
+
         ////////////////
-        
+
+        function activate() {
+            return getPosts();
+        }
+
+        function getPosts() {
+            return PostService.getPosts().then(function(data) {
+                vm.posts = data;
+                return vm.posts;
+            });
+        }
+
         function deletePost(post) {
             bootbox.confirm({
                 title: "Confirm Delete",
@@ -33,26 +45,24 @@
                         className: 'btn-danger'
                     }
                 },
-                callback: function (result) {
-                    if(result){
+                callback: function(result) {
+                    if (result) {
                         doDelete(post.id);
                     }
                 }
             });
-            
+
         }
-        
-        function doDelete(id){
-            postPrepService.deletePost(id).then(function (resp) {
+
+        function doDelete(id) {
+            PostService.deletePost(id).then(function(resp) {
                 vm.hasDeleted = true;
-                
                 vm.response['success'] = "alert-success";
                 vm.response['alert'] = "Success!";
                 vm.response['msg'] = resp.data.message;
-                vm.posts = postPrepService.posts;
-                
+                getPosts();
                 vm.hasAdded = true;
-            }).catch(function () {
+            }).catch(function() {
                 vm.response['success'] = "alert-danger";
                 vm.response['alert'] = "Error!";
                 vm.response['msg'] = "Failed to delete post.";
