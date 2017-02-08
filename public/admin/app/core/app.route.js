@@ -45,7 +45,6 @@
                     controller: "DashboardController",
                     controllerAs: "vm",
                     resolve: {
-                        //doAuth: doAuth,
                         usersPrepService: usersPrepService
                     }
                 },
@@ -62,7 +61,6 @@
                     controller: "PostController",
                     controllerAs: "vm",
                     resolve: {
-                        //doAuth: doAuth,
                         postPrepService: postPrepService
                     }
                 },
@@ -80,7 +78,6 @@
                     controller: "PostAddController",
                     controllerAs: "vm",
                     resolve: {
-                        //doAuth: doAuth,
                         categoryPrepService: categoryPrepService,
                         tagPrepService: tagPrepService
                     }
@@ -98,7 +95,6 @@
                     controller: "PostEditController",
                     controllerAs: "vm",
                     resolve: {
-                        //doAuth: doAuth,
                         categoryPrepService: categoryPrepService,
                         tagPrepService: tagPrepService
                     }
@@ -115,7 +111,6 @@
                     controller: "CategoryController",
                     controllerAs: "vm",
                     resolve: {
-                        //doAuth: doAuth,
                         categoryPrepService: categoryPrepService
                     }
                 },
@@ -132,7 +127,6 @@
                     controller: "TagController",
                     controllerAs: "vm",
                     resolve: {
-                        //doAuth: doAuth,
                         tagPrepService: tagPrepService
                     }
                 },
@@ -156,7 +150,6 @@
         navPrepService.$inject = ['NavService'];
         /* @ngInject */
         function navPrepService(NavService) {
-            //NavService.getNavs();
             return NavService.getNavs();
         }
 
@@ -170,35 +163,18 @@
         /* @ngInject */
         function postPrepService(PostService) {
             return PostService.getPosts();
-            //return PostService;
         }
 
         categoryPrepService.$inject = ['CategoryService'];
         /* @ngInject */
         function categoryPrepService(CategoryService) {
             return CategoryService.getCategories();
-            //return CategoryService;
         }
 
         tagPrepService.$inject = ['TagService'];
         /* @ngInject */
         function tagPrepService(TagService) {
             return TagService.getTags();
-            //return TagService;
-        }
-
-        doAuth.$inject = ['$auth', '$q', '$injector'];
-        /* @ngInject */
-        function doAuth($auth, $q, $injector) {
-            var deferred = $q.defer();
-            var $state = $injector.get('$state');
-            if ($auth.isAuthenticated()) {
-                deferred.resolve();
-            } else {
-                deferred.reject();
-                $state.go('auth');
-            }
-            return deferred.promise;
         }
     }
 

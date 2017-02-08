@@ -393,6 +393,35 @@ c=c.replace(q,function(a){p=a;return""});e=e||{};t(m.urlParams,function(a,b){h=e
     'use strict';
 
     angular.module('app')
+        .config(ExceptionHandler);
+
+    ExceptionHandler.$inject = ['$provide'];
+
+    /* @ngInject */
+    function ExceptionHandler($provide) {
+
+        $provide.decorator("$exceptionHandler", myExceptionHandler);
+
+        return myExceptionHandler;
+
+        /////////////
+        myExceptionHandler.$inject = ['$log'];
+
+        function myExceptionHandler($log) {
+            return function(exception, cause) {
+                $log.warn(exception);
+                //var $rootScope = $injector.get("$rootScope");
+                //$rootScope.addExceptionAlert({ message: "Exception", reason: exception }); // This represents a custom method that exists within $rootScope
+                //$delegate(exception, cause);
+            };
+        }
+    }
+
+})();
+(function() {
+    'use strict';
+
+    angular.module('app')
         .config(config)
         .run(run);
 
@@ -410,47 +439,21 @@ c=c.replace(q,function(a){p=a;return""});e=e||{};t(m.urlParams,function(a,b){h=e
     function run($rootScope, $state, $auth, bootstrap3ElementModifier) {
         bootstrap3ElementModifier.enableValidationStateIcons(true);
 
-        // $stateChangeStart is fired whenever the state changes. We can use some parameters
-        // such as toState to hook into details about the state as it is changing
         $rootScope.$on('$stateChangeStart', function(event, toState) {
             
             if (localStorage.getItem('user') != 'undefined') {
-                // Grab the user from local storage and parse it to an object
                 var user = JSON.parse(localStorage.getItem('user'));
-
-                // If there is any user data in local storage then the user is quite
-                // likely authenticated. If their token is expired, or if they are
-                // otherwise not actually authenticated, they will be redirected to
-                // the auth state because of the rejected request anyway
                 if (user && $auth.isAuthenticated()) {
-                    // The user's authenticated state gets flipped to
-                    // true so we can now show parts of the UI that rely
-                    // on the user being logged in
                     $rootScope.authenticated = true;
-
-                    // Putting the user's data on $rootScope allows
-                    // us to access it anywhere across the app. Here
-                    // we are grabbing what is in local storage
                     $rootScope.currentUser = user;
                     
-                    // If the user is logged in and we hit the auth route we don't need
-                    // to stay there and can send the user to the main state
                     if (toState.name === "auth") {
-                        // Preventing the default behavior allows us to use $state.go
-                        // to change states
                         event.preventDefault();
-
-                        // go to the "main" state which in our case is users
                         $state.go('dashboard');
                     }
                 } else {
-                    // Remove the authenticated user from local storage
                     localStorage.removeItem('user');
-                    // Flip authenticated to false so that we no longer
-                    // show UI elements dependant on the user being logged in
                     $rootScope.authenticated = false;
-
-                    // Remove the current user info from rootscope
                     $rootScope.currentUser = null;
 
                     if (toState.name !== "auth") {
@@ -509,7 +512,6 @@ c=c.replace(q,function(a){p=a;return""});e=e||{};t(m.urlParams,function(a,b){h=e
                     controller: "DashboardController",
                     controllerAs: "vm",
                     resolve: {
-                        //doAuth: doAuth,
                         usersPrepService: usersPrepService
                     }
                 },
@@ -526,7 +528,6 @@ c=c.replace(q,function(a){p=a;return""});e=e||{};t(m.urlParams,function(a,b){h=e
                     controller: "PostController",
                     controllerAs: "vm",
                     resolve: {
-                        //doAuth: doAuth,
                         postPrepService: postPrepService
                     }
                 },
@@ -544,7 +545,6 @@ c=c.replace(q,function(a){p=a;return""});e=e||{};t(m.urlParams,function(a,b){h=e
                     controller: "PostAddController",
                     controllerAs: "vm",
                     resolve: {
-                        //doAuth: doAuth,
                         categoryPrepService: categoryPrepService,
                         tagPrepService: tagPrepService
                     }
@@ -562,7 +562,6 @@ c=c.replace(q,function(a){p=a;return""});e=e||{};t(m.urlParams,function(a,b){h=e
                     controller: "PostEditController",
                     controllerAs: "vm",
                     resolve: {
-                        //doAuth: doAuth,
                         categoryPrepService: categoryPrepService,
                         tagPrepService: tagPrepService
                     }
@@ -579,7 +578,6 @@ c=c.replace(q,function(a){p=a;return""});e=e||{};t(m.urlParams,function(a,b){h=e
                     controller: "CategoryController",
                     controllerAs: "vm",
                     resolve: {
-                        //doAuth: doAuth,
                         categoryPrepService: categoryPrepService
                     }
                 },
@@ -596,7 +594,6 @@ c=c.replace(q,function(a){p=a;return""});e=e||{};t(m.urlParams,function(a,b){h=e
                     controller: "TagController",
                     controllerAs: "vm",
                     resolve: {
-                        //doAuth: doAuth,
                         tagPrepService: tagPrepService
                     }
                 },
@@ -620,7 +617,6 @@ c=c.replace(q,function(a){p=a;return""});e=e||{};t(m.urlParams,function(a,b){h=e
         navPrepService.$inject = ['NavService'];
         /* @ngInject */
         function navPrepService(NavService) {
-            //NavService.getNavs();
             return NavService.getNavs();
         }
 
@@ -634,35 +630,18 @@ c=c.replace(q,function(a){p=a;return""});e=e||{};t(m.urlParams,function(a,b){h=e
         /* @ngInject */
         function postPrepService(PostService) {
             return PostService.getPosts();
-            //return PostService;
         }
 
         categoryPrepService.$inject = ['CategoryService'];
         /* @ngInject */
         function categoryPrepService(CategoryService) {
             return CategoryService.getCategories();
-            //return CategoryService;
         }
 
         tagPrepService.$inject = ['TagService'];
         /* @ngInject */
         function tagPrepService(TagService) {
             return TagService.getTags();
-            //return TagService;
-        }
-
-        doAuth.$inject = ['$auth', '$q', '$injector'];
-        /* @ngInject */
-        function doAuth($auth, $q, $injector) {
-            var deferred = $q.defer();
-            var $state = $injector.get('$state');
-            if ($auth.isAuthenticated()) {
-                deferred.resolve();
-            } else {
-                deferred.reject();
-                $state.go('auth');
-            }
-            return deferred.promise;
         }
     }
 
@@ -1262,40 +1241,67 @@ c=c.replace(q,function(a){p=a;return""});e=e||{};t(m.urlParams,function(a,b){h=e
     angular.module('app')
         .controller('PostEditController', PostEditController);
 
-    PostEditController.$inject = ['PostService', 'HelperService', '$stateParams', 'categoryPrepService', 'tagPrepService'];
+    PostEditController.$inject = ['PostService', 'HelperService', '$stateParams', 'categoryPrepService', 'tagPrepService','$scope'];
 
     /* @ngInject */
-    function PostEditController(PostService, HelperService, $stateParams, categoryPrepService, tagPrepService) {
+    function PostEditController(PostService, HelperService, $stateParams, categoryPrepService, tagPrepService, $scope) {
         var vm = this;
 
         vm.mode = "Edit";
-        vm.postId = $stateParams.id;
-        vm.selectedPost = PostService.getPost(vm.postId);
-        vm.postForm = vm.selectedPost;
+        vm.postForm = {};
         vm.response = {};
+        vm.postId = $stateParams.id;
+        vm.selectedPost = null;
         vm.isDone = false;
         vm.categories = categoryPrepService;
-        vm.defaultCategory = vm.selectedPost.category_id;
         vm.tags = tagPrepService;
-        vm.defaultTags = vm.selectedPost.tags;
 
         vm.prevState = HelperService.getPrevState();
         vm.submitAction = editPost;
-
+        
+        activate();
+        
         ///////////////////
-
+        
+        function activate(){
+            PostService.getPost(vm.postId).then(function(data){
+                vm.selectedPost = data;
+                vm.postForm = vm.selectedPost;
+                vm.postForm.category = vm.selectedPost.category_id;
+                vm.postForm.temp_tags = getTags();
+            });
+        }
+        
         function editPost() {
+            var tags = vm.postForm.temp_tags != undefined ? vm.postForm.temp_tags.split(" ") : "";
+            vm.postForm.tags = tags;
+            
             PostService.editPost(vm.postForm).then(function() {
                 vm.response['success'] = "alert-success";
                 vm.response['alert'] = "Success!";
                 vm.response['msg'] = "Updated post.";
                 vm.isDone = true;
+                $scope.$parent.vm.getPosts();
             }).catch(function() {
                 vm.response['success'] = "alert-danger";
                 vm.response['alert'] = "Error!";
                 vm.response['msg'] = "Failed to update post.";
                 vm.isDone = true;
             });
+        }
+        
+        function getTags(){
+            var postTags = vm.selectedPost.tags;
+            var tags = '';
+            var len = postTags.length;
+            
+            if(len > 0){
+                for(var i = 0; i < len; i++){
+                    tags += postTags[i].name+' ';
+                }
+            }
+            
+            return tags.trim();
         }
     }
 })();
@@ -1346,23 +1352,30 @@ c=c.replace(q,function(a){p=a;return""});e=e||{};t(m.urlParams,function(a,b){h=e
         }
 
         function getPost(id) {
-            var selId = parseInt(id);
-            for (var i = 0; i < service.posts.length; i++) {
-                var obj = service.posts[i];
-                if (obj.id == selId) {
-                    return obj;
-                }
+            var d = $q.defer();
 
-            }
+            $http({
+                method: 'GET',
+                url: api+id,
+                //params: {id: id}
+                })
+                .then(function(data) {
+                    d.resolve(data.data);
+                })
+                .catch(function(error) {
+                    service.errors = error;
+                    d.reject(error);
+                });
+
+            return d.promise;
         }
 
         function addPost(data) {
             var url = api + "add/";
             var d = $q.defer();
-
+            console.log(data);
             $http.post(url, data)
                 .then(function(resp) {
-                    HelperService.refreshList(service.posts, resp.data.data);
                     d.resolve(resp);
                 }).catch(function(error) {
                     console.log(error.data);
@@ -1376,10 +1389,9 @@ c=c.replace(q,function(a){p=a;return""});e=e||{};t(m.urlParams,function(a,b){h=e
         function editPost(data) {
             var url = api + "edit/";
             var d = $q.defer();
-
+            
             $http.post(url, data)
                 .then(function(resp) {
-                    HelperService.refreshList(service.posts, resp.data.data);
                     d.resolve(resp);
                 }).catch(function(error) {
                     console.log(error.data);

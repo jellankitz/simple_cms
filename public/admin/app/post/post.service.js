@@ -45,23 +45,30 @@
         }
 
         function getPost(id) {
-            var selId = parseInt(id);
-            for (var i = 0; i < service.posts.length; i++) {
-                var obj = service.posts[i];
-                if (obj.id == selId) {
-                    return obj;
-                }
+            var d = $q.defer();
 
-            }
+            $http({
+                method: 'GET',
+                url: api+id,
+                //params: {id: id}
+                })
+                .then(function(data) {
+                    d.resolve(data.data);
+                })
+                .catch(function(error) {
+                    service.errors = error;
+                    d.reject(error);
+                });
+
+            return d.promise;
         }
 
         function addPost(data) {
             var url = api + "add/";
             var d = $q.defer();
-
+            console.log(data);
             $http.post(url, data)
                 .then(function(resp) {
-                    HelperService.refreshList(service.posts, resp.data.data);
                     d.resolve(resp);
                 }).catch(function(error) {
                     console.log(error.data);
@@ -75,10 +82,9 @@
         function editPost(data) {
             var url = api + "edit/";
             var d = $q.defer();
-
+            
             $http.post(url, data)
                 .then(function(resp) {
-                    HelperService.refreshList(service.posts, resp.data.data);
                     d.resolve(resp);
                 }).catch(function(error) {
                     console.log(error.data);

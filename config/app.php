@@ -189,7 +189,7 @@ return [
         /*
          * My Providers
          */
-        
+        App\Repositories\Post\PostRepoProvider::class,
     ],
 
     /*

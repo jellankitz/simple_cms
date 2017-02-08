@@ -12,11 +12,10 @@ gulp.task('scripts', function() {
             './app/core/app.module.js',
             './app/core/constants.js',
             './app/core/app.core.js',
-            //'./app/core/exceptionhandler.js',
-            
+            './app/core/exceptionhandler.js',
             './app/core/app.config.js',
             './app/core/app.route.js',
-            './app/core/app.global.js',
+            './app/core/app.helpers.js',
             './app/nav/*.js',
             './app/login/*.js',
             './app/dashboard/*.js',

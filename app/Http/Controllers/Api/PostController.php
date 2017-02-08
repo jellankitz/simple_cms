@@ -10,12 +10,13 @@ use App\Tag;
 use Cartalyst\Sentinel\Native\Facades\Sentinel;
 use App\Helpers\Helper;
 use Illuminate\Support\Facades\Log;
+use App\Repositories\Post\PostRepoInterface;
 
 class PostController extends Controller {
 
     private $post = null;
 
-    public function __construct(Post $post) {
+    public function __construct(PostRepoInterface $post) {
         $this->post = $post;
     }
 
@@ -25,9 +26,7 @@ class PostController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function index() {
-        $posts = $this->post->with('category')
-                ->with('tags')
-                ->get();
+        $posts = $this->post->getAll();
         return response()->json($posts);
     }
 
@@ -39,38 +38,13 @@ class PostController extends Controller {
      */
     public function store(StorePost $request) {
         $data = $request->all();
-        $user = Sentinel::getUser();
-
-        $data['user_id'] = $user->id;
-        $slug = Helper::getSlug($data['title'], $this->post);
-        $data['slug'] = $slug;
-        $data['category'] = isset($data['category']) ? $data['category'] : 1;
-
+        
         try {
-            $insert = $this->post->create($data);
-
-            if ($insert) {
-                
-                if(is_array($data['tags']) && count($data['tags']) > 0){
-                    $tag_model = new Tag();
-                    foreach($data['tags'] as $tag){
-                        $tag_slug = Helper::getSlug($tag, $tag_model, "name");
-                        Tag::create([
-                            'post_id' => $insert->id,
-                            'name' => $tag,
-                            'slug' => $tag_slug
-                        ]);
-                    }
-                }
-                
-                return response()->json([
-                            'success' => 1,
-                            'message' => 'Added post successfully!',
-                            'new_post' => $this->show($insert->id),
-                            'data' => $this->index()
-                                ], 200);
+            $new_post = $this->post->create($data);
+            
+            if($new_post){
+                return response()->json(['success' => 1, 'message' => 'Added new post successfully!'], 200);
             }
-
             return response()->json(['success' => 0, 'message' => 'Failed to add post!'], 400);
         } catch (Exception $ex) {
             return response()->json(['success' => 0, 'message' => 'Something went wrong'], 500);
@@ -84,33 +58,18 @@ class PostController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function show($id) {
-        $post = $this->post->with('category')
-                ->with('tags')
-                ->where('id', '=', $id)
-                ->first();
+        $post = $this->post->find($id);
         return $post;
     }
 
     public function update(StorePost $request) {
         $data = $request->all();
-        $id = $data['id'];
 
         try {
-            $exist = $this->post->find($id);
-
-            if (!$exist) {
-                return response()->json(['success' => 0, 'message' => 'Post id not exisiting.'], 400);
-            }
-
-            $update = $this->post->find($id)->update($data);
+            $update = $this->post->update($data);
 
             if ($update) {
-                $tags = Tag::whereIn('id',$data['tags'])->get();
-                Tag::where('post_id','=',$id)->delete();
-                
-                $this->post->find($id)->tags()->saveMany($tags);
-                
-                return response()->json(['success' => 1, 'message' => 'Updated post successfully!', 'data' => $this->index()], 200);
+                return response()->json(['success' => 1, 'message' => 'Updated post successfully!'], 200);
             }
 
             return response()->json(['success' => 0, 'message' => 'Update failed!'], 400);
@@ -121,13 +80,7 @@ class PostController extends Controller {
 
     public function destroy($id) {
         try {
-            $exist = $this->post->find($id);
-
-            if (!$exist) {
-                return response()->json(['success' => 0, 'message' => 'Post id not exisiting.'], 400);
-            }
-
-            $exist->delete();
+            $this->post->delete($id);
 
             return response()->json(['success' => 1, 'message' => 'Deleted post successfully!'], 200);
         } catch (Exception $ex) {
