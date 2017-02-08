@@ -939,31 +939,6 @@ c=c.replace(q,function(a){p=a;return""});e=e||{};t(m.urlParams,function(a,b){h=e
     'use strict';
 
     angular.module('app')
-        .service('Session', Session);
-
-    function Session() {
-        var self = this;
-
-        self.user = null;
-        self.create = create;
-        self.destroy = destroy;
-
-        ////////////////
-
-        function create(authUser) {
-            self.user = authUser;
-        }
-
-        function destroy() {
-            self.user = null;
-        }
-    }
-
-})();
-(function() {
-    'use strict';
-
-    angular.module('app')
         .controller('DashboardController', DashboardController);
 
     DashboardController.$inject = ['UserService', 'usersPrepService'];

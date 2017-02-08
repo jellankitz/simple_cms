@@ -14,6 +14,8 @@ interface PostRepoInterface{
     
     public function delete($id);
     
-    public function insertTags($post, $tags, $isEdit = false);
+    public function setIsHomePage($post, $is_homepage);
+    
+    public function insertTags($post, $tags, $isEdit);
 }
 

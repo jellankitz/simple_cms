@@ -37,8 +37,8 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr ng-if="vm.posts"  ng-repeat="post in vm.posts">
-                                <td class="align-middle">{{post.title}}</td>
+                            <tr ng-if="vm.posts"  ng-repeat="post in vm.posts" ng-class="{'info':post.is_homepage == 1}">
+                                <td class="align-middle">{{post.title}} <span ng-if="post.is_homepage == 1">(Homepage)</span></td>
                                 <td class="align-middle">{{post.slug}}</td>
                                 <td class="align-middle">{{post.category.name}}</td>
                                 <td class="align-middle">

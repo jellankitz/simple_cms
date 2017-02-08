@@ -17,6 +17,7 @@ class Post extends Model {
         'oslug',
         'content',
         'category_id',
+        'is_homepage',
         'created_at',
         'updated_at'
     ];

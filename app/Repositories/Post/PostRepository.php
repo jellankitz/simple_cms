@@ -8,6 +8,7 @@ use App\Category;
 use App\Tag;
 use Cartalyst\Sentinel\Native\Facades\Sentinel;
 use App\Helpers\Helper;
+use Illuminate\Support\Facades\Log;
 
 class PostRepository implements PostRepoInterface {
 
@@ -16,24 +17,25 @@ class PostRepository implements PostRepoInterface {
     function __construct(Post $post) {
         $this->post = $post;
     }
-    
+
     public function find($id) {
         $post = $this->post->with('category')
                 ->with('tags')
                 ->where('id', '=', $id)
                 ->first();
-        
+
         return $post;
     }
 
     public function getAll() {
         $posts = $this->post->with('category')
                 ->with('tags')
+                ->orderBy('is_homepage','desc')
                 ->get();
-        
+
         return $posts;
     }
-    
+
     public function create($data) {
         $user = Sentinel::getUser();
 
@@ -46,37 +48,48 @@ class PostRepository implements PostRepoInterface {
 
         if ($insert) {
             $this->insertTags($insert, $data['tags']);
+            $this->setIsHomePage($insert, $data['is_homepage']);
             return $insert->id;
         } else {
             throw new Exception('Something went wrong while inserting new post.');
         }
     }
-    
+
     public function update($data) {
         $id = $data['id'];
-        $exist = $this->post->find($id);
+        $post = $this->post->find($id);
 
-        if (!$exist) {
+        if (!$post) {
             throw new Exception('Post id not exisiting.');
         }
 
-        $update = $exist->update($data);
+        $update = $post->update($data);
 
         if ($update) {
-            $this->insertTags($exist, $data['tags'], true);
+            $this->insertTags($post, $data['tags'], true);
+            $this->setIsHomePage($post, $data['is_homepage']);
             return $id;
-        }else{
+        } else {
             throw new Exception('Something went wrong while updating post.');
+        }
+    }
+
+    public function setIsHomePage($post, $is_homepage = false) {
+        if ($is_homepage || $is_homepage == 1) {
+            $this->post
+                    ->where('is_homepage', '=', 1)
+                    ->where('id','!=',$post->id)
+                    ->update(['is_homepage' => 0]);
         }
     }
 
     public function insertTags($post, $tags, $isEdit = false) {
         if (is_array($tags) && count($tags) > 0) {
-            
-            if($isEdit){
+
+            if ($isEdit) {
                 $post->tags()->delete();
             }
-            
+
             $tag_model = new Tag();
             $tag_array = [];
             foreach ($tags as $tag) {
