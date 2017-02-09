@@ -4,10 +4,10 @@
     angular.module('app')
         .factory('CategoryService', CategoryService);
 
-    CategoryService.$inject = ['$http', 'CONST', '$q', 'AuthService', 'HelperService'];
+    CategoryService.$inject = ['$http', 'CONST', '$q', 'HelperService'];
 
     /* @ngInject */
-    function CategoryService($http, CONST, $q, AuthService, HelperService) {
+    function CategoryService($http, CONST, $q, HelperService) {
         var api = CONST.api_domain + 'category/';
 
         var service = {

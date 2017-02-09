@@ -6,6 +6,7 @@
         'ui.router',
         'satellizer',
         'jcs-autoValidate',
+        'ngProgressLite'
     ]);
             
 })();

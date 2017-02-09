@@ -15,6 +15,7 @@
         //////STATES//////
 
         //admin navigation menu
+        /*
         var nav = {
             templateUrl: "./admin/app/nav/nav.html",
             controller: "NavController",
@@ -23,7 +24,7 @@
                 navPrepService: navPrepService
             }
         };
-
+        */
         var auth = {
             name: "auth",
             url: "/auth",
@@ -48,7 +49,7 @@
                         usersPrepService: usersPrepService
                     }
                 },
-                "nav": nav
+                //"nav": nav
             }
         };
 
@@ -64,7 +65,7 @@
                         postPrepService: postPrepService
                     }
                 },
-                "nav": nav
+                //"nav": nav
             }
         };
 
@@ -114,7 +115,7 @@
                         categoryPrepService: categoryPrepService
                     }
                 },
-                "nav": nav
+                //"nav": nav
             }
         };
 
@@ -130,7 +131,7 @@
                         tagPrepService: tagPrepService
                     }
                 },
-                "nav": nav
+                //"nav": nav
             }
         };
 
