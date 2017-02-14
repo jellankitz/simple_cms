@@ -19,12 +19,20 @@
         function request(config){
             var d = $q.defer();
             var $state = $injector.get('$state');
-            console.log(config);
-            if($rootScope.authenticated || config.method == "GET" || config.url == CONST.api_domain+'authenticate'){
-                d.resolve(config);
+            
+            if(config.method != "GET"){
+                if($rootScope.authenticated){
+                    d.resolve(config);
+                }
+                else if(config.url == CONST.api_domain+'authenticate'){
+                    d.resolve(config);
+                }
+                else{
+                    d.reject(config);
+                    $state.go('auth');
+                }
             }else{
-                d.reject(config);
-                $state.go('auth');
+                d.resolve(config);
             }
             
             return d.promise;

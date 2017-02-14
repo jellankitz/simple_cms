@@ -35,6 +35,21 @@ class PostRepository implements PostRepoInterface {
 
         return $posts;
     }
+    
+    public function getAllPosts(){
+        $posts = $this->post
+                ->with('category')
+                ->with('tags')
+                ->where('is_homepage','=',0)
+                ->orderBy('updated_at','desc')
+                ->first();
+        
+        return $posts;
+    }
+    
+    public function getHomePost(){
+        return $this->post->where('is_homepage','=',1)->first();
+    }
 
     public function create($data) {
         $user = Sentinel::getUser();

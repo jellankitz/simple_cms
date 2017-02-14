@@ -17,5 +17,9 @@ interface PostRepoInterface{
     public function setIsHomePage($post, $is_homepage);
     
     public function insertTags($post, $tags, $isEdit);
+    
+    public function getHomePost();
+    
+    public function getAllPosts();
 }
 
